@@ -1,0 +1,35 @@
+# Super = Windows key
+
+<span foreground="#7AA2F7" weight="bold" size="large">Apps</span>
+<span foreground="#7AA2F7">SUPER</span>             App Launcher                <span foreground="#7AA2F7">SUPER + .</span>        Emoji Menu
+<span foreground="#7AA2F7">SUPER + T</span>         Terminal                    <span foreground="#7AA2F7">SUPER + E</span>        File Manager (spf)
+<span foreground="#7AA2F7">SUPER + B</span>         Browser (zen)
+
+<span foreground="#7AA2F7" weight="bold" size="large">Windows</span>
+<span foreground="#7AA2F7">SUPER + Q</span>         Close Window                <span foreground="#7AA2F7">SUPER + F</span>        Fullscreen
+<span foreground="#7AA2F7">SUPER + Space</span>     Toggle Floating             <span foreground="#7AA2F7">SUPER + O</span>        Opacity Menu
+<span foreground="#7AA2F7">SUPER + drag</span>      Move / Resize (LMB/RMB)
+
+<span foreground="#7AA2F7" weight="bold" size="large">Focus / Move</span>
+<span foreground="#7AA2F7">SUPER + arrows</span>    Focus window                <span foreground="#7AA2F7">SUPER + H J K L</span>  Focus (vim)
+<span foreground="#7AA2F7">SUPER + SHIFT + arrows</span>  Move / rearrange tile  <span foreground="#7AA2F7">SUPER + CTRL + arrows</span>  Resize
+
+<span foreground="#7AA2F7" weight="bold" size="large">Workspaces</span>
+<span foreground="#7AA2F7">SUPER + 1..0</span>      Switch workspace            <span foreground="#7AA2F7">SUPER + ALT + 1..0</span>  Move window to
+
+<span foreground="#7AA2F7" weight="bold" size="large">Screenshots / Recording</span>
+<span foreground="#7AA2F7">SUPER + SHIFT + S</span>  Region Screenshot          <span foreground="#7AA2F7">SUPER + Delete</span>    Screenshot (full)
+<span foreground="#7AA2F7">SUPER + SHIFT + A</span>  Region Search              <span foreground="#7AA2F7">Delete</span>            Screenshot (area)
+<span foreground="#7AA2F7">SUPER + SHIFT + X</span>  OCR (text recognition)    <span foreground="#7AA2F7">SUPER + SHIFT + C</span>  Color Picker
+<span foreground="#7AA2F7">SUPER + R</span>          Screen Record              <span foreground="#7AA2F7">SUPER + SHIFT + R</span>  Record w/ Audio
+<span foreground="#7AA2F7">Print</span>              Screenshot to clipboard
+
+<span foreground="#7AA2F7" weight="bold" size="large">System</span>
+<span foreground="#7AA2F7">SUPER + Tab</span>       Lock Screen                <span foreground="#7AA2F7">SUPER + Esc</span>       Logout Menu
+<span foreground="#7AA2F7">SUPER + SHIFT + E</span>  Exit Hyprland              <span foreground="#7AA2F7">SUPER + Z</span>        Keyboard Layout
+<span foreground="#7AA2F7">XF86 Audio keys</span>    Volume / Media             <span foreground="#7AA2F7">XF86 Brightness</span>   Screen Brightness
+
+<span foreground="#7AA2F7" weight="bold" size="large">Other</span>
+<span foreground="#7AA2F7">SUPER + W</span>         Wallpaper Picker           <span foreground="#7AA2F7">SUPER + V</span>        Clipboard (clipse)
+<span foreground="#7AA2F7">SUPER + N</span>         Notification History       <span foreground="#7AA2F7">SUPER + SHIFT + N</span>  Test Notification
+<span foreground="#7AA2F7">SUPER + SHIFT + W</span>  Toggle Waybar             <span foreground="#7AA2F7">F1</span>               This Cheatsheet
