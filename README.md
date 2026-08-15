@@ -199,7 +199,7 @@ Edit `hypr/hyprland.lua` to change:
 
 - [Hyprland](https://hyprland.org)
 - [Quickshell](https://quickshell.outfoxxed.me)
-- [DynaLinux](https://github.com/niceDev0908/DynaLinux)
+- [DynaLinux](https://github.com/Ali120B/dynalinux)
 - [hypr-lens](https://github.com/Xavist0/hypr-lens)
 - [hyprquickpaper](https://github.com/niceDev0908/hyprquickpaper)
 - [Nerd Fonts](https://www.nerdfonts.com)
