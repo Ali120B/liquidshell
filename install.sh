@@ -64,10 +64,11 @@ backup_config() {
 }
 
 # ── Selection menu ──────────────────────────────────────────────────────────
+# Everything installs. Only DynaLinux (dynamic island) is optional.
 declare -A COMPONENTS=(
-    [hyprland]="Hyprland core config (hyprland.lua, keybinds, rules, scripts, hyprlock)"
+    [hyprland]="Hyprland core config (hyprland.lua/conf, keybinds, rules, scripts, hyprlock)"
     [waybar]="Waybar status bar (config, style, GPU script)"
-    [quickshell]="Quickshell (DynaLinux island, wallpaper picker, hypr-lens screenshots)"
+    [quickshell]="Quickshell (superlauncher, wallpaper + live pickers, cheatsheet, hypr-lens)"
     [rofi]="Rofi application launcher (theme, cheatsheet theme)"
     [wlogout]="Wlogout logout screen (layout, style, icons)"
     [clipse]="Clipse clipboard manager (config, theme)"
@@ -75,7 +76,8 @@ declare -A COMPONENTS=(
     [kitty]="Kitty terminal (config + theme)"
 )
 
-SELECTED=()
+SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
+INSTALL_DYNALINUX="no"
 
 print_banner() {
     clear
@@ -93,49 +95,24 @@ EOF
 
 component_menu() {
     print_banner
-    echo -e "${BOLD}Select components to install:${NC}\n"
+    echo -e "${BOLD}This will install:${NC}\n"
 
-    local i=1
-    local keys=()
-    for key in "${!COMPONENTS[@]}"; do
-        keys+=("$key")
-    done
-    # Sort keys for consistent display
-    IFS=$'\n' keys=($(sort <<<"${keys[*]}")); unset IFS
-
+    local keys=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
     for key in "${keys[@]}"; do
-        echo -e "  ${GREEN}[$i]${NC} ${BOLD}$key${NC}  — ${COMPONENTS[$key]}"
-        ((i++))
+        echo -e "  ${GREEN}[✓]${NC} ${BOLD}$key${NC}  — ${COMPONENTS[$key]}"
     done
     echo ""
-    echo -e "  ${GREEN}[A]${NC} ${BOLD}Install ALL${NC}"
-    echo -e "  ${RED}[Q]${NC} Quit"
+    echo -e "  ${YELLOW}[?]${NC} ${BOLD}DynaLinux${NC}  — Dynamic Island (optional)"
     echo ""
 
-    read -rp "$(echo -e "${CYAN}Enter choices (space-separated numbers, e.g. 1 3 5): ${NC}")" choices
+    SELECTED=("${keys[@]}")
 
-    if [[ "${choices,,}" == "q" ]]; then
-        echo "Aborted."
-        exit 0
-    fi
-
-    SELECTED=()
-    if [[ "${choices,,}" == "a" ]]; then
-        SELECTED=("${keys[@]}")
+    read -rp "$(echo -e "${CYAN}Install DynaLinux dynamic island? [y/N]: ${NC}")" want_dyna
+    if [[ "${want_dyna,,}" == "y" ]]; then
+        INSTALL_DYNALINUX="yes"
+        info "DynaLinux will be installed"
     else
-        for num in $choices; do
-            idx=$((num - 1))
-            if [ "$idx" -ge 0 ] && [ "$idx" -lt "${#keys[@]}" ]; then
-                SELECTED+=("${keys[$idx]}")
-            else
-                warn "Invalid choice: $num (skipping)"
-            fi
-        done
-    fi
-
-    if [ ${#SELECTED[@]} -eq 0 ]; then
-        err "No valid components selected. Exiting."
-        exit 1
+        info "Skipping DynaLinux"
     fi
 
     echo ""
@@ -152,16 +129,17 @@ install_core_deps() {
     header "Core Dependencies"
 
     local core_pkgs=(
-        hyprland hyprlock hyprpaper hyprpicker
+        hyprland hyprlock hypridle hyprpaper hyprpicker
         waybar wlogout rofi-wayland dunst
         kitty clipse wl-clipboard
+        mpvpaper ffmpeg socat
         brightnessctl playerctl
         polkit-kde-agent
         qt6ct qt6-wayland kvantum
         adw-gtk3-theme
         grim slurp
         NetworkManager-applet
-        jq imagemagick curl
+        jq imagemagick curl unzip
         python3
     )
 
@@ -269,9 +247,11 @@ deploy_configs() {
                 info "Installing Hyprland config..."
                 mkdir -p "$HOME/.config/hypr/scripts"
                 cp "$RICE_DIR/hypr/hyprland.lua"   "$HOME/.config/hypr/"
+                cp "$RICE_DIR/hypr/hyprland.conf"  "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/keybinds.lua"   "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/rules.lua"       "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/hyprlock.conf"   "$HOME/.config/hypr/"
+                cp "$RICE_DIR/hypr/hypridle.conf"   "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/scripts/"*       "$HOME/.config/hypr/scripts/"
                 chmod +x "$HOME/.config/hypr/scripts/"*.sh
                 ok "Hyprland config installed"
@@ -292,20 +272,37 @@ deploy_configs() {
                 # Main shell.qml
                 cp "$RICE_DIR/quickshell/shell.qml" "$HOME/.config/quickshell/"
 
-                # hyprquickpaper (wallpaper picker)
+                # superlauncher (SUPER)
+                mkdir -p "$HOME/.config/quickshell/superlauncher"
+                cp "$RICE_DIR/quickshell/superlauncher/"*.qml "$HOME/.config/quickshell/superlauncher/"
+
+                # hyprquickpaper (static wallpaper picker, SUPER+W)
                 mkdir -p "$HOME/.config/quickshell/hyprquickpaper"
                 cp "$RICE_DIR/quickshell/hyprquickpaper/"* "$HOME/.config/quickshell/hyprquickpaper/"
 
-                # DynaLinux (Dynamic Island)
-                mkdir -p "$HOME/.config/quickshell/DynaLinux/modules/dynalinux"
-                cp "$RICE_DIR/quickshell/DynaLinux/shell.qml" "$HOME/.config/quickshell/DynaLinux/"
-                cp "$RICE_DIR/quickshell/DynaLinux/modules/dynalinux/"*.qml \
-                   "$HOME/.config/quickshell/DynaLinux/modules/dynalinux/"
+                # hyprquickpaper-live (video wallpaper picker, SUPER+SHIFT+W)
+                mkdir -p "$HOME/.config/quickshell/hyprquickpaper-live"
+                cp "$RICE_DIR/quickshell/hyprquickpaper-live/"* "$HOME/.config/quickshell/hyprquickpaper-live/"
+
+                # hyprcheatsheet (F1 cheatsheet)
+                mkdir -p "$HOME/.config/quickshell/hyprcheatsheet"
+                cp "$RICE_DIR/quickshell/hyprcheatsheet/"*.qml "$HOME/.config/quickshell/hyprcheatsheet/"
+
+                # DynaLinux (Dynamic Island, optional)
+                if [[ "$INSTALL_DYNALINUX" == "yes" ]]; then
+                    mkdir -p "$HOME/.config/quickshell/DynaLinux/modules/dynalinux"
+                    cp "$RICE_DIR/quickshell/DynaLinux/shell.qml" "$HOME/.config/quickshell/DynaLinux/"
+                    cp "$RICE_DIR/quickshell/DynaLinux/modules/dynalinux/"*.qml \
+                       "$HOME/.config/quickshell/DynaLinux/modules/dynalinux/"
+                    ok "DynaLinux installed"
+                else
+                    info "Skipping DynaLinux (not selected)"
+                fi
 
                 # hypr-lens (screenshot/OCR/recording)
                 local lens_dst="$HOME/.config/quickshell/hypr-lens"
                 mkdir -p "$lens_dst"
-                find "$RICE_DIR/quickshell/hypr-lens" -type f \( -name "*.qml" -o -name "*.js" \) | while read f; do
+                find "$RICE_DIR/quickshell/hypr-lens" -type f \( -name "*.qml" -o -name "*.js" -o -name "qmldir" \) | while read f; do
                     local rel="${f#$RICE_DIR/quickshell/hypr-lens/}"
                     mkdir -p "$lens_dst/$(dirname "$rel")"
                     cp "$f" "$lens_dst/$rel"
@@ -362,6 +359,7 @@ deploy_configs() {
     info "Replacing __HOME__ placeholders..."
     local deployed_files=(
         "$HOME/.config/quickshell/hyprquickpaper/config.json"
+        "$HOME/.config/quickshell/hyprquickpaper-live/config.json"
         "$HOME/.config/wlogout/style.css"
     )
     for f in "${deployed_files[@]}"; do
@@ -376,18 +374,18 @@ deploy_configs() {
 post_install() {
     header "Post-Install Setup"
 
-    # Create wallpaper directory if quickshell was installed
+    # Create wallpaper directories if quickshell was installed
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        mkdir -p "$HOME/Pictures"
+        mkdir -p "$HOME/Pictures/Livewall"
         if [ -z "$(ls -A "$HOME/Pictures/" 2>/dev/null)" ]; then
             info "No wallpapers found in ~/Pictures/"
-            echo "  hyprquickpaper looks for .jpg/.png files there."
-            echo "  Add some wallpapers and then run:  quickshell --path ~/.config/quickshell/hyprquickpaper"
+            echo "  hyprquickpaper looks for .jpg/.png files there (SUPER+W)."
+            echo "  Live videos go in ~/Pictures/Livewall/ (SUPER+SHIFT+W)."
         fi
     fi
 
-    # Create cache dir for wallpaper thumbnails
-    mkdir -p "$HOME/.cache/quickshell/thumbs"
+    # Create cache dirs for wallpaper thumbnails
+    mkdir -p "$HOME/.cache/quickshell/thumbs" "$HOME/.cache/quickshell/thumbs-live"
 
     # Symlink hyprland.lua -> hyprland.conf if hyprland looks for .conf
     if [ -f "$HOME/.config/hypr/hyprland.lua" ] && [ ! -f "$HOME/.config/hypr/hyprland.conf" ]; then
@@ -418,15 +416,21 @@ print_summary() {
     echo "  3. Use SUPER+T for terminal, SUPER+. for app launcher"
     echo "  4. Run 'hyprctl reload' to apply config changes"
     echo ""
-    echo -e "${BOLD}Keybinds:${NC}  SUPER+F1 for cheatsheet"
+    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W wallpapers · SUPER+SHIFT+W live wallpapers · F1 cheatsheet"
     echo ""
     echo -e "${BOLD}Wallpaper picker:${NC}"
-    echo "  SUPER+W  (requires quickshell + wallpapers in ~/Pictures/)"
+    echo "  SUPER+W        static (needs images in ~/Pictures/)"
+    echo "  SUPER+SHIFT+W  live video (needs videos in ~/Pictures/Livewall/)"
     echo ""
 
+    if [ "$INSTALL_DYNALINUX" == "yes" ]; then
+        echo -e "  ${GREEN}✓${NC} DynaLinux dynamic island"
+        echo ""
+    fi
+
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        echo -e "${YELLOW}Note:${NC} Ensure quickshell is installed:"
-        echo "  Arch: yay -S quickshell-bin  (or build from source)"
+        echo -e "${YELLOW}Note:${NC} Ensure quickshell + awww are installed (AUR):"
+        echo "  yay -S quickshell-bin awww-bin"
         echo "  https://quickshell.outfoxxed.me"
         echo ""
     fi

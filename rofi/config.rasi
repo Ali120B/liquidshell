@@ -51,7 +51,7 @@ window {
     background-color: @bg;
     border: 2px;
     border-color: @border-color;
-    border-radius: 18px;
+    border-radius: 12px;
     padding: 10;
 }
 
@@ -65,7 +65,7 @@ inputbar {
     background-color: @bg-alt;
     border: 1px;
     border-color: @border-color;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 5px 15px;
     spacing: 12px;
     children: [prompt, entry];
@@ -105,7 +105,7 @@ listview {
 element {
     background-color: transparent;
     border: 0;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px 14px;
     spacing: 14px;
 }
@@ -176,7 +176,7 @@ button {
     text-color: @fg-muted;
     border: 1px;
     border-color: @border-color;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px 14px;
     margin: 2px;
 }

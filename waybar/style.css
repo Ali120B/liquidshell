@@ -14,21 +14,21 @@ window#waybar {
 /* LEFT */
 .modules-left {
     background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 10px;
+    border-radius: 8px;
     margin: 3px 0 3px 6px;
 }
 
 /* CENTER */
 .modules-center {
     background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 10px;
+    border-radius: 8px;
     margin: 3px 0;
 }
 
 /* RIGHT */
 .modules-right {
     background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 10px;
+    border-radius: 8px;
     margin: 3px 6px 3px 0;
 }
 
@@ -54,7 +54,7 @@ window#waybar {
 #workspaces button {
     color: rgba(255, 255, 255, 0.45);
     background-color: transparent;
-    border-radius: 7px;
+    border-radius: 6px;
     padding: 0 8px;
     margin: 3px 2px;
     border: none;
@@ -102,7 +102,7 @@ tooltip {
     background-color: rgba(20, 20, 20, 0.4);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
+    border-radius: 8px;
 }
 
 tooltip label {

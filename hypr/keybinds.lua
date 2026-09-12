@@ -5,8 +5,8 @@
 
 local home = os.getenv("HOME")
 
--- Launchers
-hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("pkill rofi || rofi -show drun"), { release = true })
+-- Launchers (SUPER-tap toggles superlauncher, a quickshell config)
+hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("quickshell ipc -p " .. home .. "/.config/quickshell/superlauncher call superlauncher toggle"), { release = true })
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
@@ -19,16 +19,18 @@ hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.co
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/notifications.sh"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("notify-send 'Test Notification' 'This is a test notification from Hyprland' -a hyprland -u normal"))
 
+hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("kitty --class fzf -e sh -c 'file=$(fzf --preview \"head -50 {}\" --preview-window=right:60%) && [ -n \"$file\" ] && nvim \"$file\"'"))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 }))
 hl.bind(mainMod .. " + Space", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacity.sh"))
 
--- Toggle waybar
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("sh -c 'pgrep -x waybar >/dev/null && pkill waybar || nohup waybar >/dev/null 2>&1 &'"))
+-- Toggle waybar (moved off SUPER+SHIFT+W for live wallpaper picker)
+hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("sh -c 'pgrep -x waybar >/dev/null && pkill waybar || nohup waybar >/dev/null 2>&1 &'"))
+
+-- Live wallpaper picker (video + gif, same feel as static picker)
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper-live"))
 
 -- Screenshots
-hl.bind(mainMod .. " + Delete", hl.dsp.exec_cmd("grim " .. home .. "/Pictures/$(date +%s).png"))
-hl.bind("Delete", hl.dsp.exec_cmd('grim -g "$(slurp)" ' .. home .. '/Pictures/$(date +%s).png'))
 hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true })
 
 -- hypr-lens screenshot/OCR/search/record
@@ -45,8 +47,8 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -o window.paddi
 -- Keyboard layout
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("hyprctl switchxkblayout current next"))
 
--- Cheatsheet
-hl.bind("F1", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/cheatsheet.sh"))
+-- Cheatsheet (quickshell)
+hl.bind("F1", hl.dsp.exec_cmd("quickshell -n --path " .. home .. "/.config/quickshell/hyprcheatsheet"))
 
 -- VERIFY: exit dispatcher. Docs explicitly say to double check the exit
 -- dispatcher call when moving to Lua.

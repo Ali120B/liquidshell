@@ -70,13 +70,16 @@ PanelWindow {
         id: folderModel
         folder: "file://" + configs.wallpaper_path
         showDirs: false
-        nameFilters: ["*.png", "*.jpg"]
+        nameFilters: ["*.mp4", "*.webm", "*.mkv", "*.mov", "*.gif", "*.png", "*.jpg", "*.jpeg"]
         sortField: FolderListModel.Name
     }
 
     ListView {
         id: list
-        anchors.fill: strip
+        anchors.top: strip.top
+        anchors.bottom: strip.bottom
+        anchors.horizontalCenter: strip.horizontalCenter
+        width: Math.min(parent.width, contentWidth)
         focus: true
 
         model: folderModel
@@ -86,7 +89,7 @@ PanelWindow {
         cacheBuffer: 400
 
         property int selectedIndex: 0
-        property real tileWidth: width / configs.number_of_pictures - 10
+        property real tileWidth: Math.min(460, main.width / Math.min(Math.max(count, 1), configs.number_of_pictures) - 10)
         property real viewportCenterX: width / 2
 
         function clampIndex(i) {
@@ -186,7 +189,7 @@ PanelWindow {
                     cache: false
                     smooth: true
 
-                    source: "file://" + configs.cache_path + fileName
+                    source: "file://" + configs.cache_path + fileName + ".jpg"
 
                     // Decode once at the largest size this image will ever be shown at
                     // (the active/zoomed size), rather than tracking the animating
@@ -227,6 +230,18 @@ PanelWindow {
                     border.color: configs.border_color
 
                     transform: Shear { xFactor: main.skewFactor }
+                }
+
+                // Video badge so live videos are distinguishable in the grid
+                Text {
+                    z: 11
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 10
+                    text: "▶"
+                    color: "#B0FFFFFF"
+                    font.pixelSize: 18
+                    visible: /\.(mp4|webm|mkv|mov)$/i.test(fileName)
                 }
             }
 

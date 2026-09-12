@@ -1,9 +1,10 @@
 # Super = Windows key
 
 <span foreground="#7AA2F7" weight="bold" size="large">Apps</span>
-<span foreground="#7AA2F7">SUPER</span>             App Launcher                <span foreground="#7AA2F7">SUPER + .</span>        Emoji Menu
+<span foreground="#7AA2F7">SUPER</span>             Superlauncher             <span foreground="#7AA2F7">SUPER + .</span>        Emoji Menu
 <span foreground="#7AA2F7">SUPER + T</span>         Terminal                    <span foreground="#7AA2F7">SUPER + E</span>        File Manager (spf)
 <span foreground="#7AA2F7">SUPER + B</span>         Browser (zen)
+<span foreground="#7AA2F7">SUPER + SHIFT + F</span>  File Search (fzf)
 
 <span foreground="#7AA2F7" weight="bold" size="large">Windows</span>
 <span foreground="#7AA2F7">SUPER + Q</span>         Close Window                <span foreground="#7AA2F7">SUPER + F</span>        Fullscreen
@@ -32,4 +33,5 @@
 <span foreground="#7AA2F7" weight="bold" size="large">Other</span>
 <span foreground="#7AA2F7">SUPER + W</span>         Wallpaper Picker           <span foreground="#7AA2F7">SUPER + V</span>        Clipboard (clipse)
 <span foreground="#7AA2F7">SUPER + N</span>         Notification History       <span foreground="#7AA2F7">SUPER + SHIFT + N</span>  Test Notification
-<span foreground="#7AA2F7">SUPER + SHIFT + W</span>  Toggle Waybar             <span foreground="#7AA2F7">F1</span>               This Cheatsheet
+<span foreground="#7AA2F7">SUPER + SHIFT + W</span>  Live Wallpaper Picker     <span foreground="#7AA2F7">SUPER + CTRL + W</span>  Toggle Waybar
+<span foreground="#7AA2F7">F1</span>               This Cheatsheet

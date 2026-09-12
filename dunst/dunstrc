@@ -38,7 +38,7 @@
     min_icon_size = 32
     max_icon_size = 48
     icon_path = /usr/share/icons/hicolor/48x48/status/:/usr/share/icons/hicolor/48x48/devices/
-    corner_radius = 14
+    corner_radius = 12
 
 [urgency_low]
     background = "#1a1b26E6"

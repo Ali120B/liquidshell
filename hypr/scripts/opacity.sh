@@ -1,10 +1,11 @@
 #!/bin/bash
 
-choice=$(printf "100%%\n90%%\n80%%\n70%%\n60%%\n50%%\n40%%" | rofi -dmenu -p "Opacity")
+choice=$(printf "100%%\n90%%\n85%%\n80%%\n70%%\n60%%\n50%%\n40%%" | rofi -dmenu -p "Opacity")
 
 case "$choice" in
     "100%") opacity=1.0 ;;
     "90%")  opacity=0.9 ;;
+    "85%")  opacity=0.85 ;;
     "80%")  opacity=0.8 ;;
     "70%")  opacity=0.7 ;;
     "60%")  opacity=0.6 ;;

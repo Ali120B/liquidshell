@@ -11,12 +11,26 @@
 -- four times would leave you with only one (broken, effect-less) rule.
 -- Below, each rule gets a unique name and the missing `float = true` is added.
 
-local window_opacity = 0.8
+local window_opacity = 0.85
 local window_inactive_opacity = 0.65
 
 -- Layer rules (old: layerrule = blur on / ignore_alpha 0.15, match:namespace rofi)
 hl.layer_rule({
     match = { namespace = "rofi" },
+    blur = true,
+    ignore_alpha = 0.15,
+})
+
+-- Same glass blur for the superlauncher overlay
+hl.layer_rule({
+    match = { namespace = "quickshell:superlauncher" },
+    blur = true,
+    ignore_alpha = 0.15,
+})
+
+-- Same glass blur for the cheatsheet overlay
+hl.layer_rule({
+    match = { namespace = "quickshell:hyprcheatsheet" },
     blur = true,
     ignore_alpha = 0.15,
 })
