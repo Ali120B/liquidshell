@@ -140,9 +140,13 @@ PanelWindow {
 
             // This IS the delegate's real layout width, so as it grows, ListView pushes
             // every following tile further along - real spacing, not an overlapping overlay.
-            // No Behavior here: widths snap instantly per selection (keeping layout
-            // loop-free) while contentX glides; layering animations here caused sluggishness.
+            // Width animates alongside the contentX glide so tiles swell/shrink smoothly.
+            // Safe: widths converge to fixed per-selection values (no layout feedback).
             width: baseWidth * scaleFactor
+
+            Behavior on width {
+                NumberAnimation { duration: main.animDuration; easing.type: Easing.InOutQuad }
+            }
 
             Item {
                 id: content
@@ -151,6 +155,10 @@ PanelWindow {
                 // Height scale uses the same factor but caps at 1.0 - the row is already
                 // full window height, so growing past that would just get clipped.
                 height: delegateItem.height * Math.min(1, delegateItem.scaleFactor)
+
+                Behavior on height {
+                    NumberAnimation { duration: main.animDuration; easing.type: Easing.InOutQuad }
+                }
 
                 Text {
                     id: alt
