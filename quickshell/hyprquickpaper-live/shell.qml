@@ -76,10 +76,7 @@ PanelWindow {
 
     ListView {
         id: list
-        anchors.top: strip.top
-        anchors.bottom: strip.bottom
-        anchors.horizontalCenter: strip.horizontalCenter
-        width: Math.min(parent.width, contentWidth)
+        anchors.fill: strip
         focus: true
 
         model: folderModel
@@ -89,7 +86,7 @@ PanelWindow {
         cacheBuffer: 400
 
         property int selectedIndex: 0
-        property real tileWidth: Math.min(460, main.width / Math.min(Math.max(count, 1), configs.number_of_pictures) - 10)
+        property real tileWidth: width / configs.number_of_pictures - 10
         property real viewportCenterX: width / 2
 
         function clampIndex(i) {
