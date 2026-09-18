@@ -93,14 +93,14 @@ PanelWindow {
         preferredHighlightEnd: centerLead
         highlightMoveDuration: main.animDuration
 
-        // ponytail: fixed-width spacers (no contentWidth feedback) so the
-        // first/last items can reach screen center too.
-        header: Item { width: list.centerLead + 40; height: 1 }
+        // ponytail: fixed-width spacers (no contentWidth feedback). Header is
+        // exact so the first item starts centered; footer has slack so the
+        // last item can reach center too.
+        header: Item { width: list.centerLead; height: 1 }
         footer: Item { width: list.centerLead + 40; height: 1 }
 
         property real tileWidth: width / configs.number_of_pictures - 10
-        property real viewportCenterX: width / 2
-        // Leading space that puts an item at screen center when pinned.
+        // Leading space that puts the current item at screen center when pinned.
         property real centerLead: width / 2 - tileWidth * main.zoomScale / 2
 
         function clampIndex(i) {
@@ -124,29 +124,24 @@ PanelWindow {
             height: 500
             property bool active: index === list.currentIndex
 
-            // Base (unscaled) slot width. Used to work out where this tile currently sits
-            // on screen for the magnification curve below. Deliberately NOT derived from
-            // this item's own (dynamic) width - if it were, width would depend on position
-            // which would depend on width, i.e. a binding loop.
             readonly property real baseWidth: list.tileWidth
 
-            // --- Dock-style magnification: scale depends on on-screen position ---
-            // One binding instead of several chained ones - list.contentX already animates
-            // smoothly (SmoothedAnimation below), so this recomputes every frame during
-            // scroll anyway; no need for extra Behavior/NumberAnimation layered on top of
-            // it (that was two animations fighting over the same value, which is what was
-            // causing the sluggish feel).
+            // --- Dock-style magnification, driven by SELECTION distance ---
+            // Position-driven zoom fed layout back into itself (widths shift
+            // x, x shifts zoom) and oscillated against the scroll clamp at
+            // the row ends. Distance from currentIndex is layout-independent,
+            // so widths settle instantly and the ends can't flicker.
             property real scaleFactor: {
-                const centerX = x - list.contentX + baseWidth / 2
-                const frac = Math.min(1, Math.abs(centerX - list.viewportCenterX) / list.viewportCenterX)
-                const t = 1 - frac * frac * (3 - 2 * frac) // smoothstep falloff
-                return main.edgeScale + (main.zoomScale - main.edgeScale) * t
+                const d = Math.abs(index - list.currentIndex)
+                const t = Math.max(0, 1 - d / 2.5)
+                const s = t * t * (3 - 2 * t) // smoothstep falloff
+                return main.edgeScale + (main.zoomScale - main.edgeScale) * s
             }
 
             // This IS the delegate's real layout width, so as it grows, ListView pushes
             // every following tile further along - real spacing, not an overlapping overlay.
-            // No Behavior here: it already tracks contentX's smooth animation 1:1, and tiles
-            // never overlap in this layout, so there's nothing to visually smooth over.
+            // No Behavior here: widths snap instantly per selection (keeping layout
+            // loop-free) while contentX glides; layering animations here caused sluggishness.
             width: baseWidth * scaleFactor
 
             Item {
