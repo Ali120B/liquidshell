@@ -8,7 +8,6 @@ PanelWindow {
     id: main
 
     // ---- Easy-to-edit settings ----
-    property int speed: 5000          // scroll animation speed
     property int animDuration: 100    // ms for scroll animation
     property real zoomScale: 0.8        // scale of the tile at screen center (peak)
     property real edgeScale: 0.3      // scale of tiles at the screen edges (trough)
@@ -85,54 +84,45 @@ PanelWindow {
         clip: true
         cacheBuffer: 400
 
-        property int selectedIndex: 0
+        // Selection-centered carousel: the current item is pinned to the
+        // screen center, so the dock-zoom peak and the selection always
+        // agree - even when the whole row fits on screen and there is
+        // nothing to free-scroll.
+        highlightRangeMode: ListView.StrictlyEnforceRange
+        preferredHighlightBegin: centerLead
+        preferredHighlightEnd: centerLead
+        highlightMoveDuration: main.animDuration
+
+        // ponytail: fixed-width spacers (no contentWidth feedback) so the
+        // first/last items can reach screen center too.
+        header: Item { width: list.centerLead + 40; height: 1 }
+        footer: Item { width: list.centerLead + 40; height: 1 }
+
         property real tileWidth: width / configs.number_of_pictures - 10
         property real viewportCenterX: width / 2
+        // Leading space that puts an item at screen center when pinned.
+        property real centerLead: width / 2 - tileWidth * main.zoomScale / 2
 
         function clampIndex(i) {
             return Math.max(0, Math.min(i, count - 1))
         }
 
-        function clampX(x) {
-            return Math.max(0, Math.min(x, contentWidth - width))
-        }
-
         function activateCurrent() {
-            const path = folderModel.get(selectedIndex, "filePath")
+            const path = folderModel.get(currentIndex, "filePath")
             Quickshell.execDetached(["bash", Quickshell.shellPath("commands.sh"), path])
             Qt.quit()
         }
 
-        function ensureVisibleAnimated(i) {
-            const step = tileWidth + spacing
-            const itemStart = i * step
-            const itemEnd = itemStart + tileWidth + 20
-
-            if (itemStart < contentX)
-                contentX = clampX(itemStart)
-            else if (itemEnd > contentX + width)
-                contentX = clampX(itemStart - (width - step))
-        }
-
-        // Moves the selection by `delta` tiles, animating at `speedMultiplier`x speed
-        function moveSelection(delta, speedMultiplier) {
-            anim.v = main.speed * speedMultiplier
-            selectedIndex = clampIndex(selectedIndex + delta)
-            ensureVisibleAnimated(selectedIndex)
-        }
-
-        Behavior on contentX {
-            SmoothedAnimation {
-                id: anim
-                property int v: main.speed
-                duration: main.animDuration
-            }
+        // Moves the selection by `delta` tiles; the view glides the new
+        // current item to the center automatically.
+        function moveSelection(delta) {
+            currentIndex = clampIndex(currentIndex + delta)
         }
 
         delegate: Item {
             id: delegateItem
             height: 500
-            property bool active: index === list.selectedIndex
+            property bool active: index === list.currentIndex
 
             // Base (unscaled) slot width. Used to work out where this tile currently sits
             // on screen for the magnification curve below. Deliberately NOT derived from
@@ -246,11 +236,11 @@ PanelWindow {
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onEntered: list.selectedIndex = index
+                onEntered: list.currentIndex = index
                 onClicked: list.activateCurrent()
 
                 onWheel: function(wheel) {
-                    list.flick(-wheel.angleDelta.y * 8, 0)
+                    list.moveSelection(wheel.angleDelta.y < 0 ? 1 : -1)
                     wheel.accepted = true
                 }
             }
@@ -261,16 +251,16 @@ PanelWindow {
 
             switch (event.key) {
             case Qt.Key_J:
-                moveSelection(1, 1)
+                moveSelection(1)
                 break
             case Qt.Key_K:
-                moveSelection(-1, 1)
+                moveSelection(-1)
                 break
             case Qt.Key_D:
-                moveSelection(big, big)
+                moveSelection(big)
                 break
             case Qt.Key_U:
-                moveSelection(-big, big)
+                moveSelection(-big)
                 break
             case Qt.Key_Space:
             case Qt.Key_Return:
