@@ -238,11 +238,6 @@ PanelWindow {
 
                 onEntered: list.currentIndex = index
                 onClicked: list.activateCurrent()
-
-                onWheel: function(wheel) {
-                    list.moveSelection(wheel.angleDelta.y < 0 ? 1 : -1)
-                    wheel.accepted = true
-                }
             }
         }
 
