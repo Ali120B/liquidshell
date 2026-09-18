@@ -71,6 +71,10 @@ PanelWindow {
         showDirs: false
         nameFilters: ["*.mp4", "*.webm", "*.mkv", "*.mov", "*.gif", "*.png", "*.jpg", "*.jpeg"]
         sortField: FolderListModel.Name
+        onCountChanged: {
+            if (count > 0 && !list.settled)
+                settleTimer.restart()
+        }
     }
 
     ListView {
@@ -88,10 +92,26 @@ PanelWindow {
         // screen center, so the dock-zoom peak and the selection always
         // agree - even when the whole row fits on screen and there is
         // nothing to free-scroll.
-        highlightRangeMode: ListView.StrictlyEnforceRange
+        highlightRangeMode: settled ? ListView.StrictlyEnforceRange : ListView.NoHighlightRange
         preferredHighlightBegin: centerLead
         preferredHighlightEnd: centerLead
         highlightMoveDuration: main.animDuration
+
+        // Startup gate: load transients (model/config arriving, tiles morphing
+        // to final size) can park contentX off-center. Hold enforcement off
+        // until geometry settles, then pin the current item exactly.
+        property bool settled: false
+        onCurrentIndexChanged: settled = true
+
+        Timer {
+            id: settleTimer
+            interval: 400
+            repeat: false
+            onTriggered: {
+                list.positionViewAtIndex(list.currentIndex, ListView.Center)
+                list.settled = true
+            }
+        }
 
         // ponytail: fixed-width spacers (no contentWidth feedback). Header is
         // exact so the first item starts centered; footer has slack so the
