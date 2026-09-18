@@ -234,10 +234,16 @@ PanelWindow {
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: true
 
-                onEntered: list.currentIndex = index
-                onClicked: list.activateCurrent()
+                onClicked: {
+                    list.currentIndex = index
+                    list.activateCurrent()
+                }
+
+                onWheel: function(wheel) {
+                    list.moveSelection(wheel.angleDelta.y < 0 ? 1 : -1)
+                    wheel.accepted = true
+                }
             }
         }
 
