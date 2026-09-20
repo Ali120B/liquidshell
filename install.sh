@@ -132,7 +132,8 @@ install_core_deps() {
         hyprland hyprlock hypridle hyprpaper hyprpicker
         waybar wlogout rofi-wayland dunst
         kitty clipse wl-clipboard
-        ffmpeg socat
+        ffmpeg socat wf-recorder
+        satty swappy tesseract tesseract-data-eng
         brightnessctl playerctl
         polkit-kde-agent
         qt6ct qt6-wayland kvantum
@@ -444,6 +445,18 @@ deploy_configs() {
                 if [ -f "$RICE_DIR/quickshell/hypr-lens/modules/common/qmldir" ]; then
                     mkdir -p "$lens_dst/modules/common"
                     cp "$RICE_DIR/quickshell/hypr-lens/modules/common/qmldir" "$lens_dst/modules/common/"
+                fi
+
+                # record.sh backend (SUPER+R screen recording shells out to
+                # ~/.local/share/hypr-lens/scripts/videos/record.sh)
+                if [ -f "$RICE_DIR/quickshell/hypr-lens/scripts/videos/record.sh" ]; then
+                    mkdir -p "$HOME/.local/share/hypr-lens/scripts/videos"
+                    cp "$RICE_DIR/quickshell/hypr-lens/scripts/videos/record.sh" \
+                       "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
+                    chmod +x "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
+                    ok "hypr-lens record backend installed"
+                else
+                    warn "hypr-lens record.sh missing from repo, SUPER+R will not work"
                 fi
 
                 ok "Quickshell configs installed"
