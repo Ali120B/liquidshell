@@ -266,6 +266,53 @@ install_sung() {
     fi
 }
 
+# ── CypherGate VPN ────────────────────────────────────────────────────────────
+install_cyphergate() {
+    header "CypherGate VPN"
+
+    if command -v cyphergate &>/dev/null; then
+        ok "CypherGate already installed"
+    else
+        echo -e "CypherGate is a Linux-first VPNGate client (SUPER+SHIFT+V to launch).\n"
+        echo "  Repo: https://github.com/Cypher-Monarch/CypherGate"
+        echo ""
+        read -rp "$(echo -e "${CYAN}Install CypherGate? [Y/n]: ${NC}")" install_cg
+        if [[ "${install_cg,,}" != "n" ]]; then
+            case "$DISTRO_ID" in
+                arch|cachyos|manjaro|endeavouros|garuda)
+                    info "Importing CypherGate release signing key..."
+                    gpg --keyserver hkps://keys.openpgp.org \
+                        --recv-keys 9ED87F6065033606670941AAC6C9B498797C980E 2>/dev/null \
+                        || warn "GPG key import failed (install may still work if key is cached)"
+                    if command -v yay &>/dev/null; then
+                        yay -S --needed --noconfirm cyphergatevpn-bin || warn "yay install failed"
+                    elif command -v paru &>/dev/null; then
+                        paru -S --needed --noconfirm cyphergatevpn-bin || warn "paru install failed"
+                    else
+                        warn "No AUR helper (yay/paru) found. Install manually: https://github.com/Cypher-Monarch/CypherGate"
+                    fi
+                    ;;
+                *)
+                    info "On non-Arch distros use the upstream installer:"
+                    echo "  curl -fsSL https://github.com/Cypher-Monarch/CypherGate/releases/latest/download/install.sh > install.sh"
+                    echo "  sudo bash install.sh"
+                    ;;
+            esac
+        else
+            warn "Skipping CypherGate (SUPER+SHIFT+V will not work without it)"
+        fi
+    fi
+
+    # Backend daemon owns the VPN connection lifecycle; make sure it runs
+    if command -v cyphergate &>/dev/null; then
+        if sudo systemctl enable --now cyphergated.service 2>/dev/null; then
+            ok "cyphergated service enabled and started"
+        else
+            warn "Could not enable cyphergated.service (start it manually: sudo systemctl enable --now cyphergated.service)"
+        fi
+    fi
+}
+
 # ── Install fonts ────────────────────────────────────────────────────────────
 install_fonts() {
     header "Fonts"
@@ -515,6 +562,7 @@ print_summary() {
         echo "  quickshell: https://quickshell.outfoxxed.me"
         echo "  skwd-wall:  yay -S skwd-wall-v2-bin (https://github.com/liixini/skwd-wall)"
         echo "  Sung:       built from https://github.com/yappologistic/Sung into ~/.local/bin/sung"
+        echo "  CypherGate: yay -S cyphergatevpn-bin (https://github.com/Cypher-Monarch/CypherGate, SUPER+SHIFT+V)"
         echo ""
     fi
 }
@@ -538,6 +586,7 @@ main() {
 
     install_skwd_wall
     install_sung
+    install_cyphergate
 
     install_fonts
     deploy_configs
