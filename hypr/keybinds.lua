@@ -15,7 +15,7 @@ hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofi -show emoji -theme-str 'me
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("skwd-wall-v2"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/notifications.sh"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("notify-send 'Test Notification' 'This is a test notification from Hyprland' -a hyprland -u normal"))
 
@@ -24,11 +24,11 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 }))
 hl.bind(mainMod .. " + Space", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacity.sh"))
 
--- Toggle waybar (moved off SUPER+SHIFT+W for live wallpaper picker)
+-- Toggle waybar
 hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("sh -c 'pgrep -x waybar >/dev/null && pkill waybar || nohup waybar >/dev/null 2>&1 &'"))
 
--- Live wallpaper picker (video + gif, same feel as static picker)
-hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper-live"))
+-- Wallpaper mixer (images + video + Wallpaper Engine scenes via skwd-wall)
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("skwd-wall-v2 --mixer"))
 
 -- Screenshots
 hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true })
@@ -50,9 +50,9 @@ hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("hyprctl switchxkblayout current next
 -- Cheatsheet (quickshell)
 hl.bind("F1", hl.dsp.exec_cmd("quickshell -n --path " .. home .. "/.config/quickshell/hyprcheatsheet"))
 
--- VERIFY: exit dispatcher. Docs explicitly say to double check the exit
--- dispatcher call when moving to Lua.
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exit())
+-- hl.dsp.exit() is broken on Hyprland 0.55+ (and so is `hyprctl dispatch exit`
+-- from the CLI) - log out via loginctl instead, same as wlogout does.
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("loginctl terminate-session $XDG_SESSION_ID"))
 
 -- Focus (H/J/K/L = left/down/up/right, vim-style, matching your original)
 hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))

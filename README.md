@@ -15,7 +15,7 @@ A full Hyprland rice with Quickshell Dynamic Island, frosted glass Waybar, wallp
 | **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity |
 | **DynaLinux** | Quickshell Dynamic Island — volume HUD, media controls, timer, battery, weather, notifications |
 | **Waybar** | Frosted glass top bar — workspaces, CPU, RAM, clock, mpris, volume, power button |
-| **hyprquickpaper** | Scrollable wallpaper picker with dock-style zoom magnification |
+| **skwd-wall** | Wallpaper manager — picker + mixer, images / video / Wallpaper Engine scenes |
 | **hypr-lens** | Region screenshot, OCR, screen recording, reverse image search, color picker |
 | **Rofi** | Themed app launcher + keybind cheatsheet viewer |
 | **Wlogout** | Circular button logout screen (shutdown, reboot, logout) |
@@ -99,7 +99,7 @@ The installer will:
 ~/.config/
 ├── hypr/           ← hyprland.lua, keybinds.lua, rules.lua, hyprlock.conf, scripts/
 ├── waybar/         ← config.jsonc, style.css, scripts/
-├── quickshell/     ← shell.qml, DynaLinux/, hyprquickpaper/, hypr-lens/
+├── quickshell/     ← shell.qml, DynaLinux/, hypr-lens/
 ├── rofi/           ← config.rasi, cheatsheet.rasi, colors.rasi
 ├── wlogout/        ← layout, style.css, icons/
 ├── clipse/         ← config.json, custom_theme.json
@@ -115,26 +115,28 @@ If you prefer not to use the installer:
 
 1. Clone the repo
 2. Copy each folder to `~/.config/`
-3. Edit `quickshell/hyprquickpaper/config.json` and replace `__HOME__` with your actual home path
-4. Edit `wlogout/style.css` and replace `__HOME__` with your actual home path
-5. Make scripts executable: `chmod +x ~/.config/hypr/scripts/*.sh`
+3. Edit `wlogout/style.css` and replace `__HOME__` with your actual home path
+4. Make scripts executable: `chmod +x ~/.config/hypr/scripts/*.sh`
 
 ---
 
 ## Configuration
 
-### Wallpaper Picker
+### Wallpaper (skwd-wall)
 
-Add `.jpg` / `.png` wallpapers to `~/Pictures/`, then launch:
+Wallpapers are handled by [skwd-wall](https://github.com/liixini/skwd-wall)
+(images + video + Wallpaper Engine scenes), running as the user service
+`skwd-walld`. It restores the last wallpaper on login by itself.
 
-```bash
-quickshell --path ~/.config/quickshell/hyprquickpaper
-```
+- `SUPER+W` — picker (`skwd-wall-v2`)
+- `SUPER+SHIFT+W` — mixer, opened directly (`skwd-wall-v2 --mixer`)
+- Library default is `~/Pictures/Wallpapers` (change in Settings > Sources);
+  videos in `~/Pictures/Livewall/` apply fine too, e.g.
+  `skwd-helm apply ~/Pictures/Livewall/mist-over-the-pines.1920x1080.mp4`
+- Pause/resume video wallpapers: `skwd-helm pause` / `skwd-helm resume`
 
-Edit `quickshell/hyprquickpaper/config.json` to change:
-- `wallpaper_path` — where your wallpapers live
-- `number_of_pictures` — tiles visible at once
-- `border_color` — selection highlight color
+The old `hyprquickpaper` / `hyprquickpaper-live` pickers and the
+`awww`+`mpvpaper` helpers are retired (kept as `*.retired` for rollback).
 
 ### Dynamic Island (DynaLinux)
 
@@ -201,7 +203,7 @@ Edit `hypr/hyprland.lua` to change:
 - [Quickshell](https://quickshell.outfoxxed.me)
 - [DynaLinux](https://github.com/Ali120B/dynalinux)
 - [hypr-lens](https://github.com/Xavist0/hypr-lens)
-- [hyprquickpaper](https://github.com/niceDev0908/hyprquickpaper)
+- [skwd-wall](https://github.com/liixini/skwd-wall)
 - [Nerd Fonts](https://www.nerdfonts.com)
 
 ---

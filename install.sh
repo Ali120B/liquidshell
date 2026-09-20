@@ -39,7 +39,7 @@ detect_distro() {
 install_packages() {
     local pkgs=("$@")
     case "$DISTRO_ID" in
-        arch|manjaro|endeavouros)
+        arch|cachyos|manjaro|endeavouros|garuda)
             sudo pacman -S --needed --noconfirm "${pkgs[@]}" ;;
         fedora)
             sudo dnf install -y "${pkgs[@]}" ;;
@@ -68,7 +68,7 @@ backup_config() {
 declare -A COMPONENTS=(
     [hyprland]="Hyprland core config (hyprland.lua/conf, keybinds, rules, scripts, hyprlock)"
     [waybar]="Waybar status bar (config, style, GPU script)"
-    [quickshell]="Quickshell (superlauncher, wallpaper + live pickers, cheatsheet, hypr-lens)"
+    [quickshell]="Quickshell (superlauncher, cheatsheet, hypr-lens)"
     [rofi]="Rofi application launcher (theme, cheatsheet theme)"
     [wlogout]="Wlogout logout screen (layout, style, icons)"
     [clipse]="Clipse clipboard manager (config, theme)"
@@ -132,7 +132,7 @@ install_core_deps() {
         hyprland hyprlock hypridle hyprpaper hyprpicker
         waybar wlogout rofi-wayland dunst
         kitty clipse wl-clipboard
-        mpvpaper ffmpeg socat
+        ffmpeg socat
         brightnessctl playerctl
         polkit-kde-agent
         qt6ct qt6-wayland kvantum
@@ -170,7 +170,7 @@ install_quickshell_deps() {
     read -rp "$(echo -e "${CYAN}Install quickshell extra deps? [Y/n]: ${NC}")" install_qs
     if [[ "${install_qs,,}" != "n" ]]; then
         case "$DISTRO_ID" in
-            arch|manjaro|endeavouros)
+            arch|cachyos|manjaro|endeavouros|garuda)
                 sudo pacman -S --needed --noconfirm material-symbols-ttf noto-fonts
                 info "Quickshell must be installed separately (AUR / source build)"
                 ;;
@@ -178,6 +178,91 @@ install_quickshell_deps() {
                 info "Please install quickshell manually: https://quickshell.outfoxxed.me"
                 ;;
         esac
+    fi
+}
+
+# ── Skwd-wall (wallpaper manager) ─────────────────────────────────────────────
+install_skwd_wall() {
+    header "Skwd-wall Wallpaper Manager"
+
+    if command -v skwd-wall-v2 &>/dev/null; then
+        ok "skwd-wall already installed"
+    else
+        echo -e "Wallpapers are handled by ${BOLD}skwd-wall${NC} (SUPER+W picker, SUPER+SHIFT+W mixer).\n"
+        read -rp "$(echo -e "${CYAN}Install skwd-wall? [Y/n]: ${NC}")" install_skwd
+        if [[ "${install_skwd,,}" != "n" ]]; then
+            case "$DISTRO_ID" in
+                arch|cachyos|manjaro|endeavouros|garuda)
+                    if command -v yay &>/dev/null; then
+                        yay -S --needed --noconfirm skwd-wall-v2-bin || warn "yay install failed"
+                    elif command -v paru &>/dev/null; then
+                        paru -S --needed --noconfirm skwd-wall-v2-bin || warn "paru install failed"
+                    else
+                        warn "No AUR helper (yay/paru) found. Install manually: https://github.com/liixini/skwd-wall"
+                    fi
+                    ;;
+                *)
+                    info "skwd-wall packages are distro-specific. See https://github.com/liixini/skwd-wall#installation"
+                    ;;
+            esac
+        else
+            warn "Skipping skwd-wall (wallpaper keybinds will not work without it)"
+        fi
+    fi
+
+    # Daemon is systemd-managed; make sure it is enabled and running
+    if command -v skwd-wall-v2 &>/dev/null; then
+        if systemctl --user enable --now skwd-walld.service 2>/dev/null; then
+            ok "skwd-walld service enabled and started"
+        else
+            warn "Could not enable skwd-walld.service (start it manually: systemctl --user start skwd-walld)"
+        fi
+    fi
+}
+
+# ── Sung music player ─────────────────────────────────────────────────────────
+install_sung() {
+    header "Sung Music Player"
+
+    if [[ -x "$HOME/.local/bin/sung" ]]; then
+        ok "Sung already installed ($HOME/.local/bin/sung)"
+        return 0
+    fi
+
+    echo -e "Sung is a native Material 3 music player (YouTube Music, local files, Navidrome/Jellyfin).\n"
+    echo "  Repo: https://github.com/yappologistic/Sung"
+    echo ""
+    read -rp "$(echo -e "${CYAN}Install Sung? [Y/n]: ${NC}")" install_sung_app
+    if [[ "${install_sung_app,,}" == "n" ]]; then
+        warn "Skipping Sung"
+        return 0
+    fi
+
+    case "$DISTRO_ID" in
+        arch|cachyos|manjaro|endeavouros|garuda)
+            info "Installing Sung build dependencies..."
+            install_packages git base-devel cmake ninja python nodejs ffmpeg \
+                qt6-base qt6-declarative qt6-multimedia qt6-svg qt6-wayland qt6-imageformats \
+                || warn "Some Sung dependencies may have failed"
+            ;;
+        *)
+            info "Install Qt 6.8+ dev packages, CMake, Ninja, Python, Node.js and FFmpeg manually,"
+            info "then the script will clone and build Sung. See https://github.com/yappologistic/Sung#install"
+            ;;
+    esac
+
+    if [[ ! -d "$HOME/Sung" ]]; then
+        info "Cloning Sung..."
+        git clone https://github.com/yappologistic/Sung.git "$HOME/Sung" || { err "Sung clone failed"; return 1; }
+    else
+        info "Using existing checkout at $HOME/Sung"
+    fi
+
+    info "Building and installing Sung (per-user, ~/.local)..."
+    if ( cd "$HOME/Sung" && ./scripts/install.sh ); then
+        ok "Sung installed"
+    else
+        warn "Sung install script reported an error"
     fi
 }
 
@@ -252,7 +337,10 @@ deploy_configs() {
                 cp "$RICE_DIR/hypr/rules.lua"       "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/hyprlock.conf"   "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/hypridle.conf"   "$HOME/.config/hypr/"
-                cp "$RICE_DIR/hypr/scripts/"*       "$HOME/.config/hypr/scripts/"
+                cp "$RICE_DIR/hypr/scripts/"*.sh      "$HOME/.config/hypr/scripts/"
+                cp "$RICE_DIR/hypr/scripts/"*.txt      "$HOME/.config/hypr/scripts/" 2>/dev/null || true
+                # Never redeploy retired scripts (e.g. awww/mpvpaper wallpaper helpers)
+                rm -f "$HOME/.config/hypr/scripts/"*.retired
                 chmod +x "$HOME/.config/hypr/scripts/"*.sh
                 ok "Hyprland config installed"
                 ;;
@@ -276,13 +364,11 @@ deploy_configs() {
                 mkdir -p "$HOME/.config/quickshell/superlauncher"
                 cp "$RICE_DIR/quickshell/superlauncher/"*.qml "$HOME/.config/quickshell/superlauncher/"
 
-                # hyprquickpaper (static wallpaper picker, SUPER+W)
-                mkdir -p "$HOME/.config/quickshell/hyprquickpaper"
-                cp "$RICE_DIR/quickshell/hyprquickpaper/"* "$HOME/.config/quickshell/hyprquickpaper/"
-
-                # hyprquickpaper-live (video wallpaper picker, SUPER+SHIFT+W)
-                mkdir -p "$HOME/.config/quickshell/hyprquickpaper-live"
-                cp "$RICE_DIR/quickshell/hyprquickpaper-live/"* "$HOME/.config/quickshell/hyprquickpaper-live/"
+                # Wallpapers are handled by skwd-wall (SUPER+W picker,
+                # SUPER+SHIFT+W mixer). The old hyprquickpaper pickers are
+                # retired (see quickshell/*.retired for rollback).
+                # Ensure no retired picker gets redeployed.
+                rm -rf "$HOME/.config/quickshell/hyprquickpaper" "$HOME/.config/quickshell/hyprquickpaper-live"
 
                 # hyprcheatsheet (F1 cheatsheet)
                 mkdir -p "$HOME/.config/quickshell/hyprcheatsheet"
@@ -358,8 +444,6 @@ deploy_configs() {
     # Replace __HOME__ placeholders with actual $HOME in deployed configs
     info "Replacing __HOME__ placeholders..."
     local deployed_files=(
-        "$HOME/.config/quickshell/hyprquickpaper/config.json"
-        "$HOME/.config/quickshell/hyprquickpaper-live/config.json"
         "$HOME/.config/wlogout/style.css"
     )
     for f in "${deployed_files[@]}"; do
@@ -374,18 +458,15 @@ deploy_configs() {
 post_install() {
     header "Post-Install Setup"
 
-    # Create wallpaper directories if quickshell was installed
+    # Wallpaper library for skwd-wall (defaults to ~/Pictures/Wallpapers).
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        mkdir -p "$HOME/Pictures/Livewall"
-        if [ -z "$(ls -A "$HOME/Pictures/" 2>/dev/null)" ]; then
-            info "No wallpapers found in ~/Pictures/"
-            echo "  hyprquickpaper looks for .jpg/.png files there (SUPER+W)."
-            echo "  Live videos go in ~/Pictures/Livewall/ (SUPER+SHIFT+W)."
+        mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall"
+        if [ -z "$(ls -A "$HOME/Pictures/Wallpapers/" 2>/dev/null)" ]; then
+            info "No wallpapers found in ~/Pictures/Wallpapers/"
+            echo "  Add images there, or point skwd-wall at another folder in Settings > Sources."
+            echo "  Videos in ~/Pictures/Livewall/ work too (apply via picker or 'skwd-helm apply <file>')."
         fi
     fi
-
-    # Create cache dirs for wallpaper thumbnails
-    mkdir -p "$HOME/.cache/quickshell/thumbs" "$HOME/.cache/quickshell/thumbs-live"
 
     # Symlink hyprland.lua -> hyprland.conf if hyprland looks for .conf
     if [ -f "$HOME/.config/hypr/hyprland.lua" ] && [ ! -f "$HOME/.config/hypr/hyprland.conf" ]; then
@@ -416,11 +497,12 @@ print_summary() {
     echo "  3. Use SUPER+T for terminal, SUPER+. for app launcher"
     echo "  4. Run 'hyprctl reload' to apply config changes"
     echo ""
-    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W wallpapers · SUPER+SHIFT+W live wallpapers · F1 cheatsheet"
+    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W skwd-wall picker · SUPER+SHIFT+W mixer · F1 cheatsheet"
     echo ""
-    echo -e "${BOLD}Wallpaper picker:${NC}"
-    echo "  SUPER+W        static (needs images in ~/Pictures/)"
-    echo "  SUPER+SHIFT+W  live video (needs videos in ~/Pictures/Livewall/)"
+    echo -e "${BOLD}Wallpaper (skwd-wall):${NC}"
+    echo "  SUPER+W        picker (images + video + Wallpaper Engine scenes)"
+    echo "  SUPER+SHIFT+W  mixer (open directly)"
+    echo "  Library default: ~/Pictures/Wallpapers (change in Settings > Sources)"
     echo ""
 
     if [ "$INSTALL_DYNALINUX" == "yes" ]; then
@@ -429,9 +511,10 @@ print_summary() {
     fi
 
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        echo -e "${YELLOW}Note:${NC} Ensure quickshell + awww are installed (AUR):"
-        echo "  yay -S quickshell-bin awww-bin"
-        echo "  https://quickshell.outfoxxed.me"
+        echo -e "${YELLOW}Note:${NC} quickshell, skwd-wall and Sung are installed automatically (AUR / source build):"
+        echo "  quickshell: https://quickshell.outfoxxed.me"
+        echo "  skwd-wall:  yay -S skwd-wall-v2-bin (https://github.com/liixini/skwd-wall)"
+        echo "  Sung:       built from https://github.com/yappologistic/Sung into ~/.local/bin/sung"
         echo ""
     fi
 }
@@ -452,6 +535,9 @@ main() {
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
         install_quickshell_deps
     fi
+
+    install_skwd_wall
+    install_sung
 
     install_fonts
     deploy_configs
