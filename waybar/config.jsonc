@@ -7,7 +7,7 @@
 
     "modules-left": ["hyprland/workspaces", "cpu", "memory"],
     "modules-center": ["clock"],
-    "modules-right": ["mpris", "pulseaudio", "custom/power"],
+    "modules-right": ["mpris", "pulseaudio", "custom/pacman", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{id}",
@@ -57,6 +57,14 @@
         },
         "tooltip": false,
         "on-click": "pavucontrol"
+    },
+
+    "custom/pacman": {
+        "exec": "$HOME/.config/waybar/scripts/pacman.sh",
+        "return-type": "json",
+        "interval": 3600,
+        "on-click": "kitty -e yay",
+        "tooltip": true
     },
 
     "custom/power": {

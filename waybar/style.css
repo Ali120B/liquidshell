@@ -39,6 +39,7 @@ window#waybar {
 #clock,
 #pulseaudio,
 #mpris,
+#custom-pacman,
 #custom-power {
     padding: 0 10px;
     margin: 0 2px;
@@ -87,6 +88,18 @@ window#waybar {
     margin-right: 10px;
 }
 
+/* Pacman updates — 3600s interval, 0% idle */
+#custom-pacman {
+    color: #a6adc8;
+}
+#custom-pacman.pacman-updates {
+    color: #f38ba8;
+    font-weight: bold;
+}
+#custom-pacman.pacman-ok {
+    color: #6c7086;
+}
+
 /* MPRIS */
 #mpris {
     min-width: 0;
@@ -117,6 +130,7 @@ tooltip label {
 #clock,
 #pulseaudio,
 #mpris,
+#custom-pacman,
 #custom-power {
     transition: font-size 0.15s ease;
 }
@@ -126,6 +140,7 @@ tooltip label {
 #clock:hover,
 #pulseaudio:hover,
 #mpris:hover,
+#custom-pacman:hover,
 #custom-power:hover {
     font-size: 14px;
 }
