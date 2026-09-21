@@ -577,6 +577,13 @@ print_summary() {
 
 # ── Main ────────────────────────────────────────────────────────────────────
 main() {
+    if [[ "${1:-}" == "--update-mode" ]]; then
+        detect_distro
+        SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
+        deploy_configs
+        post_install
+        return 0
+    fi
     # Check if running as root
     if [ "$EUID" -eq 0 ]; then
         err "Do not run this script as root."
