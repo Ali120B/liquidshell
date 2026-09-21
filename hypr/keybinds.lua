@@ -16,7 +16,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("skwd-wall-v2"))
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("quickshell ipc -p " .. home .. "/.config/quickshell/notifcenter call notifcenter toggle"))
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/notifications.sh"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("notify-send 'Test Notification' 'This is a test notification from Hyprland' -a hyprland -u normal"))
 
 hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("kitty --class fzf -e sh -c 'file=$(fzf --preview \"head -50 {}\" --preview-window=right:60%) && [ -n \"$file\" ] && nvim \"$file\"'"))

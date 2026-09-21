@@ -81,7 +81,7 @@ backup_config() {
 declare -A COMPONENTS=(
     [hyprland]="Hyprland core config (hyprland.lua/conf, keybinds, rules, scripts, hyprlock)"
     [waybar]="Waybar status bar (config, style, GPU script)"
-    [quickshell]="Quickshell (cheatsheet + external: launcher, DynaLinux, hypr-lens, notifcenter)"
+    [quickshell]="Quickshell (cheatsheet + external: launcher, DynaLinux, hypr-lens)"
     [rofi]="Rofi application launcher (theme, cheatsheet theme)"
     [wlogout]="Wlogout logout screen (layout, style, icons)"
     [clipse]="Clipse clipboard manager (config, theme)"
@@ -482,10 +482,6 @@ EOF
                 else
                     info "Skipping DynaLinux (not selected)"
                 fi
-
-                # NotifCenter — translucent top-right history (Ali120B/notifcenter)
-                clone_or_pull "https://github.com/Ali120B/notifcenter.git" "$HOME/.config/quickshell/notifcenter"
-                ok "NotifCenter installed"
 
                 # Clean old retired pickers
                 rm -rf "$HOME/.config/quickshell/hyprquickpaper" "$HOME/.config/quickshell/hyprquickpaper-live"
