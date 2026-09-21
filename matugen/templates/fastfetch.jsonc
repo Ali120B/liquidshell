@@ -1,0 +1,8 @@
+{
+  "logo": {
+    "color": {
+      "primary": "{{colors.primary.default.hex}}",
+      "secondary": "{{colors.secondary.default.hex}}"
+    }
+  }
+}

@@ -13,8 +13,10 @@ case "$FILE" in
         hyprctl hyprpaper unload all 2>/dev/null || true
         sleep 0.2
         nice -n 5 mpvpaper -o "loop --mute=yes --hwdec=auto --framedrop=vo" '*' "$FILE" &
+        bash "$HOME/.config/hypr/scripts/matugen.sh" "$FILE" 2>/dev/null & disown || true
         ;;
     *)
         hyprctl hyprpaper wallpaper ",$FILE" 2>/dev/null || hyprctl hyprpaper wallpaper "eDP-1,$FILE" 2>/dev/null || true
+        bash "$HOME/.config/hypr/scripts/matugen.sh" "$FILE" 2>/dev/null & disown || true
         ;;
 esac

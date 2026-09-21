@@ -1,0 +1,23 @@
+[config]
+reload_apps = false
+set_wallpaper = false
+
+[templates.kitty]
+input_path = "templates/kitty.conf"
+output_path = "~/.config/kitty/current-theme.conf"
+
+[templates.foot]
+input_path = "templates/foot.ini"
+output_path = "~/.config/foot/foot.ini"
+
+[templates.waybar]
+input_path = "templates/waybar.css"
+output_path = "~/.config/waybar/colors.css"
+
+[templates.hyprland]
+input_path = "templates/hyprland.conf"
+output_path = "~/.config/hypr/scheme/current.lua"
+
+[templates.fastfetch]
+input_path = "templates/fastfetch.jsonc"
+output_path = "~/.config/fastfetch/colors.jsonc"

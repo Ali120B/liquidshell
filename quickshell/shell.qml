@@ -15,10 +15,7 @@ import Quickshell.Hyprland
 ShellRoot {
     id: root
 
-    // Lazy: only load RegionSelector when actually triggered (Super+Shift+S etc.)
-    // Saves ~30ms startup and keeps idle 0% (no regionSelector bindings when closed)
-    Loader {
-        active: GlobalStates.regionSelectorOpen
-        sourceComponent: RegionSelector {}
+    RegionSelector {
+        id: regionSelector
     }
 }

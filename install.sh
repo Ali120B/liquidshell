@@ -131,7 +131,8 @@ install_core_deps() {
         hyprland hyprlock hypridle hyprpaper hyprpicker
         waybar wlogout rofi-wayland dunst
         kitty foot clipse wl-clipboard
-        awww mpvpaper ffmpeg socat wf-recorder
+        mpvpaper ffmpeg socat wf-recorder
+        matugen
         satty swappy tesseract tesseract-data-eng
         brightnessctl playerctl
         hyprpolkitagent
@@ -385,6 +386,12 @@ EOF
                     chmod +x "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
                     ok "hypr-lens record backend (custom) installed"
                 fi
+
+                # Matugen — theme kitty/foot/waybar/hyprland on wallpaper change
+                mkdir -p "$HOME/.config/matugen/templates"
+                cp "$RICE_DIR/matugen/config.toml" "$HOME/.config/matugen/config.toml" 2>/dev/null || true
+                cp "$RICE_DIR/matugen/templates/"* "$HOME/.config/matugen/templates/" 2>/dev/null || true
+                ok "Matugen config installed"
 
                 ok "Quickshell configs installed"
                 ;;
