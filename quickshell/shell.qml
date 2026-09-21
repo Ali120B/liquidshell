@@ -21,7 +21,4 @@ ShellRoot {
         active: GlobalStates.regionSelectorOpen
         sourceComponent: RegionSelector {}
     }
-
-    // Keep GlobalStates always alive for the active check
-    GlobalStates { id: globalStates }
 }
