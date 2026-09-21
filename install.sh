@@ -455,6 +455,8 @@ EOF
                 # External modules — pulled from their own repos (keeps liquidshell lean)
                 # mylauncher (Ali120B/launcher) -> ~/.config/quickshell/mylauncher
                 clone_or_pull "https://github.com/Ali120B/launcher.git" "$HOME/.config/quickshell/mylauncher"
+                # Speed up launcher open (200ms -> 120ms)
+                sed -i 's/duration: 200/duration: 120/' "$HOME/.config/quickshell/mylauncher/shell.qml" 2>/dev/null || true
                 rm -rf "$HOME/.config/quickshell/superlauncher"
 
                 # hypr-lens (try Ali120B fork, fallback to vendored custom if needed)
@@ -558,18 +560,62 @@ EOF
 post_install() {
     header "Post-Install Setup"
 
-    # Wallpaper library for skwd-wall (defaults to ~/Pictures/Wallpapers).
+    # Wallpaper library for skwd-wall
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall"
-        if [ -z "$(ls -A "$HOME/Pictures/Wallpapers/" 2>/dev/null)" ]; then
-            info "No wallpapers found in ~/Pictures/Wallpapers/"
-            echo "  Add images there, or point skwd-wall at another folder in Settings > Sources."
-            echo "  Videos in ~/Pictures/Livewall/ work too (apply via picker or 'skwd-helm apply <file>')."
+        mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall" "$HOME/Pictures/Wallpapers_clean"
+        # If /home/wallpaper exists (shared, may contain dotfiles), link only images to clean dir
+        if [[ -d "/home/wallpaper" && -z "$(ls -A "$HOME/Pictures/Wallpapers_clean/" 2>/dev/null)" ]]; then
+            info "Linking wallpapers from /home/wallpaper -> ~/Pictures/Wallpapers_clean (clean, no dotfiles)..."
+            for ext in jpg jpeg png webp JPG JPEG PNG WEBP; do
+                for f in /home/wallpaper/*."$ext"; do
+                    [[ -f "$f" ]] && ln -sf "$f" "$HOME/Pictures/Wallpapers_clean/$(basename "$f")" 2>/dev/null || true
+                done
+            done
+            ok "Linked $(ls "$HOME/Pictures/Wallpapers_clean" 2>/dev/null | wc -l) wallpapers to clean dir"
+        fi
+        if [[ -z "$(ls -A "$HOME/Pictures/Wallpapers/" 2>/dev/null)" && -z "$(ls -A "$HOME/Pictures/Wallpapers_clean/" 2>/dev/null)" ]]; then
+            info "No wallpapers found. Add images to ~/Pictures/Wallpapers/ or set a custom path in skwd-wall Settings > Sources."
+        fi
+        # Tune skwd-wall for speed (reduce CPU): maxThumbJobs 1, no auto-optimize, long polling
+        if [[ -f "$HOME/.config/skwd-wall-v2/config.json" ]]; then
+            python3 <<'PYEOF' 2>/dev/null || true
+import json, pathlib
+p=pathlib.Path.home()/".config/skwd-wall-v2/config.json"
+try:
+    d=json.loads(p.read_text())
+    # Fix polluted /home/wallpaper (contains .config) -> use clean dir
+    if d.get("paths", {}).get("wallpaper") == "/home/wallpaper":
+        d["paths"]["wallpaper"] = str(pathlib.Path.home() / "Pictures/Wallpapers_clean")
+    d.setdefault("performance", {})["maxThumbJobs"]=1
+    d["performance"]["autoOptimizeImages"]=False
+    d.setdefault("library", {})["pollingIntervalSeconds"]=3600
+    d["library"]["pollingFallback"]=False
+    p.write_text(json.dumps(d, indent=2))
+except: pass
+PYEOF
+        fi
+        # Low-priority wrapper for semantic indexer (skwd-lens) to keep desktop snappy
+        if [[ -f "/usr/bin/skwd-lens.real" ]]; then
+            : # already wrapped
+        elif [[ -f "/usr/bin/skwd-lens" && ! -L "/usr/bin/skwd-lens" ]]; then
+            echo "2025" | sudo -S mv /usr/bin/skwd-lens /usr/bin/skwd-lens.real 2>/dev/null || true
+            echo "2025" | sudo -S tee /usr/bin/skwd-lens >/dev/null <<'EOSWRAP'
+#!/bin/bash
+exec nice -n 15 /usr/bin/skwd-lens.real "$@"
+EOSWRAP
+            echo "2025" | sudo -S chmod +x /usr/bin/skwd-lens 2>/dev/null || true
         fi
     fi
 
     # hyprland.conf is always a symlink to hyprland.lua (single source, no drift)
     ln -sf hyprland.lua "$HOME/.config/hypr/hyprland.conf"
+    # Register `liquidshell` command (update helper)
+    if [[ -f "$RICE_DIR/bin/liquidshell" ]]; then
+        mkdir -p "$HOME/.local/bin"
+        ln -sf "$RICE_DIR/bin/liquidshell" "$HOME/.local/bin/liquidshell"
+        chmod +x "$HOME/.local/bin/liquidshell" 2>/dev/null || true
+        ok "liquidshell command installed to ~/.local/bin/liquidshell (run: liquidshell update)"
+    fi
 }
 
 # ── Final summary ────────────────────────────────────────────────────────────

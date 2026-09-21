@@ -13,7 +13,6 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 | Component | Description |
 |-----------|-------------|
 | **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity |
-| **NotifCenter** | Translucent top-right notification center (dunst history, blur, `SUPER+N`) — [Ali120B/notifcenter](https://github.com/Ali120B/notifcenter) |
 | **Launcher** | One-shot app launcher (`SUPER`, `superlauncher` IPC) — [Ali120B/launcher](https://github.com/Ali120B/launcher) |
 | **DynaLinux** | Dynamic Island — HUD, media, timer, battery (optional) — [Ali120B/dynalinux](https://github.com/Ali120B/dynalinux) |
 | **hypr-lens** | Region screenshot, OCR, search, recording — [Ali120B/hypr-lens](https://github.com/Ali120B/hypr-lens) (custom `record.sh` overlay) |
@@ -68,7 +67,7 @@ Suggested: fullscreen desktop, waybar closeup, DynaLinux island expanded, rofi l
 | `SUPER + SHIFT + V` | VPN (CypherGate) |
 | `SUPER + ALT + V` | Show exit IP + VPN state |
 | `SUPER + CTRL + W` | Toggle Waybar |
-| `SUPER + N` | Notification Center (translucent, `dunst` history) |
+| `SUPER + N` | Notification History |
 | `SUPER + O` | Opacity Menu |
 | `SUPER + Tab` | Lock Screen (pauses video wallpaper) |
 | `SUPER + Escape` | Logout Menu |
@@ -101,6 +100,15 @@ The installer will:
 5. Back up any existing `~/.config/` configs
 6. Deploy everything to the right places
 7. Replace path placeholders with your actual `$HOME`
+8. Register `liquidshell` command to `~/.local/bin/liquidshell`
+
+### Update
+
+```bash
+liquidshell update        # pull all repos (rice + launcher/DynaLinux/hypr-lens/Sung) and redeploy (overwrites)
+liquidshell update --yes  # no prompt
+liquidshell status        # show rice + app versions
+```
 
 ### What Gets Installed
 
@@ -109,7 +117,7 @@ The installer will:
 ├── hypr/           ← hyprland.lua, keybinds.lua, rules.lua, hyprlock.conf, scripts/
 ├── waybar/         ← config.jsonc, style.css, scripts/
 ├── quickshell/     ← shell.qml, hyprcheatsheet/  (lean)
-│                    + external clones: notifcenter/, mylauncher/ (launcher), DynaLinux/, hypr-lens/
+│                    + external clones: mylauncher/ (launcher), DynaLinux/, hypr-lens/
 │                    + custom overlay: custom/hypr-lens/record.sh
 ├── rofi/           ← config.rasi, cheatsheet.rasi, colors.rasi
 ├── wlogout/        ← layout, style.css, icons/
@@ -172,18 +180,9 @@ the Lua (`luac`), lint-checks the scripts (`bash -n`), validates waybar's
 `config.jsonc` and flags duplicate keybinds. `install.sh` runs it (repo
 scope) before deploying anything.
 
-### Notification Center (NotifCenter)
-
-`SUPER+N` toggles a translucent top-right panel (`quickshell notifcenter`).
-- Frosted glass with Hyprland `layerrule blur` (`quickshell:notifcenter`)
-- Reads `dunstctl history` live, `Clear All` and `DND` toggle
-- Keeps `dunst` for popups — this is history only
-- Autostart: `quickshell -n -d -p ~/.config/quickshell/notifcenter`
-- Repo: [Ali120B/notifcenter](https://github.com/Ali120B/notifcenter), pulled by `install.sh`
-
 ### Quickshell externals
 
-`install.sh` keeps `liquidshell` lean — `DynaLinux`, `launcher` (`mylauncher` path), `hypr-lens`, and `notifcenter` are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` to `git pull` them.
+`install.sh` keeps `liquidshell` lean — `DynaLinux`, `launcher` (`mylauncher` path), and `hypr-lens` are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` or `liquidshell update` to `git pull` them.
 
 ### Dynamic Island (DynaLinux)
 
@@ -248,7 +247,6 @@ Edit `hypr/hyprland.lua` to change:
 
 - [Hyprland](https://hyprland.org)
 - [Quickshell](https://quickshell.outfoxxed.me)
-- [NotifCenter](https://github.com/Ali120B/notifcenter) — translucent notification center
 - [Launcher](https://github.com/Ali120B/launcher) — app launcher (`superlauncher` IPC)
 - [DynaLinux](https://github.com/Ali120B/dynalinux)
 - [hypr-lens](https://github.com/Ali120B/hypr-lens)

@@ -14,7 +14,8 @@ theme_image() {
     [[ -f "$img" ]] || { echo "wallpaper-theme: not a file: $img" >&2; return 1; }
 
     local json
-    json=$(matugen image -j hex --dry-run --prefer darkness "$img" 2>/dev/null) || {
+    # nice + ionice to keep desktop responsive during theme gen
+    json=$(nice -n 10 ionice -c 3 matugen image -j hex --dry-run --prefer darkness "$img" 2>/dev/null) || {
         echo "wallpaper-theme: matugen failed for $img" >&2; return 1
     }
 
@@ -103,7 +104,7 @@ case "${1:-}" in
         # skwd-helm watch --exec substitutes %path% per wallpaper event.
         cur=$(skwd-helm current --json 2>/dev/null | jq -r '.outputs[0].path // empty')
         [[ -n "$cur" ]] && theme_image "$cur"
-        exec skwd-helm watch --exec "$HOME/.config/hypr/scripts/wallpaper-theme.sh %path%"
+        exec nice -n 10 skwd-helm watch --exec "$HOME/.config/hypr/scripts/wallpaper-theme.sh %path%"
         ;;
     --current)
         cur=$(skwd-helm current --json 2>/dev/null | jq -r '.outputs[0].path // empty')

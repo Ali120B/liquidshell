@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# liquidshell — update and manage the rice
+# Usage: liquidshell update [--yes]  (pulls all repos and redeploys, overwrites)
+#        liquidshell status           (show versions)
+set -euo pipefail
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
+info(){ echo -e "${BLUE}[INFO]${NC}  $*"; }
+ok(){ echo -e "${GREEN}[OK]${NC}    $*"; }
+warn(){ echo -e "${YELLOW}[WARN]${NC}  $*"; }
+err(){ echo -e "${RED}[ERR]${NC}   $*"; }
+
+RICE_DIR="$HOME/liquidshell"
+# helper: clone or pull
+clone_or_pull(){
+  local repo="$1" dest="$2"
+  if [[ -d "$dest/.git" ]]; then
+    info "Pulling $dest"
+    git -C "$dest" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Pull failed for $dest (will re-clone on next install)"
+  else
+    info "Cloning $repo -> $dest"
+    rm -rf "$dest"
+    git clone --depth 1 "$repo" "$dest" 2>&1 | sed 's/^/  /' || warn "Clone failed for $repo"
+  fi
+}
+
+do_update(){
+  local yes=0
+  [[ "${1:-}" == "--yes" || "${1:-}" == "-y" ]] && yes=1
+  if [[ $yes -eq 0 ]]; then
+    echo -e "${BOLD}${CYAN}This will overwrite local configs with the rice (hypr, waybar, quickshell, etc.)${NC}"
+    read -rp "Continue? [y/N]: " ans
+    [[ "${ans,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+  fi
+  # 1. Pull main rice
+  if [[ -d "$RICE_DIR/.git" ]]; then
+    info "Updating liquidshell..."
+    git -C "$RICE_DIR" pull --ff-only 2>&1 | sed 's/^/  /' || warn "liquidshell pull failed"
+  else
+    warn "No $RICE_DIR git repo found"
+  fi
+  # 2. Pull external quickshell modules (lean)
+  clone_or_pull "https://github.com/Ali120B/launcher.git" "$HOME/.config/quickshell/mylauncher"
+  # launcher ipc target is superlauncher, keep path mylauncher for compat
+  clone_or_pull "https://github.com/Ali120B/dynalinux.git" "$HOME/.config/quickshell/DynaLinux"
+  if [[ -f "$HOME/.config/quickshell/DynaLinux/quickshell/shell.qml" ]]; then
+    cp -r "$HOME/.config/quickshell/DynaLinux/quickshell/"* "$HOME/.config/quickshell/DynaLinux/" 2>/dev/null || true
+  fi
+  clone_or_pull "https://github.com/Ali120B/hypr-lens.git" "$HOME/.config/quickshell/hypr-lens"
+  # custom record.sh overlay
+  if [[ -f "$RICE_DIR/quickshell/custom/hypr-lens/scripts/videos/record.sh" ]]; then
+    mkdir -p "$HOME/.local/share/hypr-lens/scripts/videos"
+    cp "$RICE_DIR/quickshell/custom/hypr-lens/scripts/videos/record.sh" "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
+    chmod +x "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
+  fi
+  # 3. Pull other apps (if present)
+  if [[ -d "$HOME/Sung/.git" ]]; then
+    info "Updating Sung..."
+    git -C "$HOME/Sung" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Sung pull failed"
+    # rebuild if needed? user can run ./scripts/install.sh manually
+  fi
+  # 4. Update system packages for rice deps (optional, not forced)
+  # 5. Deploy dots (overwrite)
+  info "Deploying configs (overwrite)..."
+  bash "$RICE_DIR/install.sh" --update-mode 2>&1 | tail -n 30 || {
+    # fallback: direct copy
+    warn "install.sh --update-mode not supported, doing direct copy"
+    for d in hypr waybar quickshell rofi wlogout clipse dunst kitty; do
+      if [[ -d "$RICE_DIR/$d" ]]; then
+        mkdir -p "$HOME/.config/$d"
+        cp -r "$RICE_DIR/$d/"* "$HOME/.config/$d/" 2>&1 | sed 's/^/  /' || true
+      fi
+    done
+  }
+  # ensure hyprland.conf symlink
+  ln -sf hyprland.lua "$HOME/.config/hypr/hyprland.conf" 2>/dev/null || true
+  # 6. Reload
+  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    info "Reloading Hyprland..."
+    hyprctl reload 2>&1 | head -n 5
+  fi
+  ok "Update complete. Re-login for full effect (quickshell, waybar)."
+}
+
+do_status(){
+  echo -e "${BOLD}liquidshell status${NC}"
+  echo " rice: $(git -C "$RICE_DIR" rev-parse --short HEAD 2>/dev/null || echo "?") $(git -C "$RICE_DIR" log --oneline -1 2>/dev/null | cut -c1-60)"
+  for d in "$HOME/.config/quickshell/mylauncher" "$HOME/.config/quickshell/DynaLinux" "$HOME/.config/quickshell/hypr-lens" "$HOME/Sung"; do
+    if [[ -d "$d/.git" ]]; then
+      echo " $(basename "$d"): $(git -C "$d" rev-parse --short HEAD 2>/dev/null) $(git -C "$d" log --oneline -1 2>/dev/null | cut -c1-50)"
+    else
+      echo " $(basename "$d"): not cloned"
+    fi
+  done
+  systemctl --user is-active skwd-walld 2>&1 | sed 's/^/ skwd-walld: /'
+  pgrep -a quickshell 2>&1 | sed 's/^/ quickshell: /' | head -n 10
+}
+
+case "${1:-}" in
+  update) shift; do_update "$@" ;;
+  status) do_status ;;
+  help|--help|-h) echo "Usage: liquidshell update [--yes]  # pull all repos and redeploy (overwrites)"; echo "       liquidshell status"; ;;
+  *) echo "Usage: liquidshell update [--yes] | status"; exit 1 ;;
+esac
