@@ -41,10 +41,6 @@ do_update(){
   # 2. Pull external quickshell modules (lean)
   clone_or_pull "https://github.com/Ali120B/launcher.git" "$HOME/.config/quickshell/mylauncher"
   # launcher ipc target is superlauncher, keep path mylauncher for compat
-  clone_or_pull "https://github.com/Ali120B/dynalinux.git" "$HOME/.config/quickshell/DynaLinux"
-  if [[ -f "$HOME/.config/quickshell/DynaLinux/quickshell/shell.qml" ]]; then
-    cp -r "$HOME/.config/quickshell/DynaLinux/quickshell/"* "$HOME/.config/quickshell/DynaLinux/" 2>/dev/null || true
-  fi
   clone_or_pull "https://github.com/Ali120B/hypr-lens.git" "$HOME/.config/quickshell/hypr-lens"
   # custom record.sh overlay
   if [[ -f "$RICE_DIR/quickshell/custom/hypr-lens/scripts/videos/record.sh" ]]; then
@@ -84,7 +80,7 @@ do_update(){
 do_status(){
   echo -e "${BOLD}liquidshell status${NC}"
   echo " rice: $(git -C "$RICE_DIR" rev-parse --short HEAD 2>/dev/null || echo "?") $(git -C "$RICE_DIR" log --oneline -1 2>/dev/null | cut -c1-60)"
-  for d in "$HOME/.config/quickshell/mylauncher" "$HOME/.config/quickshell/DynaLinux" "$HOME/.config/quickshell/hypr-lens" "$HOME/Sung"; do
+  for d in "$HOME/.config/quickshell/mylauncher" "$HOME/.config/quickshell/hypr-lens" "$HOME/Sung"; do
     if [[ -d "$d/.git" ]]; then
       echo " $(basename "$d"): $(git -C "$d" rev-parse --short HEAD 2>/dev/null) $(git -C "$d" log --oneline -1 2>/dev/null | cut -c1-50)"
     else

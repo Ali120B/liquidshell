@@ -37,7 +37,6 @@ window#waybar {
 #workspaces,
 #cpu,
 #memory,
-#custom-vpn,
 #clock,
 #pulseaudio,
 #mpris,
@@ -82,20 +81,6 @@ window#waybar {
     color: rgba(255, 255, 255, 0.35);
 }
 
-/* VPN */
-#custom-vpn {
-    font-weight: bold;
-}
-#custom-vpn.vpn-on {
-    color: #9ece6a;
-}
-#custom-vpn.vpn-idle {
-    color: #e0af68;
-}
-#custom-vpn.vpn-off {
-    color: #f7768e;
-}
-
 /* Power */
 #custom-power {
     color: #ffffff;
@@ -130,7 +115,6 @@ tooltip label {
 #workspaces,
 #cpu,
 #memory,
-#custom-vpn,
 #clock,
 #pulseaudio,
 #mpris,

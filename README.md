@@ -14,12 +14,10 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 |-----------|-------------|
 | **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity |
 | **Launcher** | One-shot app launcher (`SUPER`, `superlauncher` IPC) — [Ali120B/launcher](https://github.com/Ali120B/launcher) |
-| **DynaLinux** | Dynamic Island — HUD, media, timer, battery (optional) — [Ali120B/dynalinux](https://github.com/Ali120B/dynalinux) |
 | **hypr-lens** | Region screenshot, OCR, search, recording — [Ali120B/hypr-lens](https://github.com/Ali120B/hypr-lens) (custom `record.sh` overlay) |
 | **Waybar** | Frosted glass top bar — workspaces, CPU, RAM, clock, mpris, volume, power button |
 | **skwd-wall** | Wallpaper manager — picker + mixer, images / video / Wallpaper Engine scenes |
 | **Sung** | Native Material 3 music player (auto-installed by `install.sh`) |
-| **CypherGate** | VPNGate client — `SUPER+SHIFT+V`, waybar pill, auto-restart guard |
 | **Rofi** | Themed app launcher + keybind cheatsheet viewer |
 | **Wlogout** | Circular button logout screen (shutdown, reboot, logout) |
 | **Clipse** | Clipboard manager with custom pink/blue theme |
@@ -34,7 +32,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 
 ```
 Put screenshots in a screenshots/ folder or link them from an external host.
-Suggested: fullscreen desktop, waybar closeup, DynaLinux island expanded, rofi launcher.
+Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 ```
 
 ---
@@ -64,8 +62,6 @@ Suggested: fullscreen desktop, waybar closeup, DynaLinux island expanded, rofi l
 | `SUPER + R` | Screen Record (toggle) |
 | `SUPER + SHIFT + R` | Screen Record with sound |
 | `SUPER + SHIFT + C` | Color Picker |
-| `SUPER + SHIFT + V` | VPN (CypherGate) |
-| `SUPER + ALT + V` | Show exit IP + VPN state |
 | `SUPER + CTRL + W` | Toggle Waybar |
 | `SUPER + N` | Notification History |
 | `SUPER + O` | Opacity Menu |
@@ -105,7 +101,7 @@ The installer will:
 ### Update
 
 ```bash
-liquidshell update        # pull all repos (rice + launcher/DynaLinux/hypr-lens/Sung) and redeploy (overwrites)
+liquidshell update        # pull all repos (rice + launcher/hypr-lens/Sung) and redeploy (overwrites)
 liquidshell update --yes  # no prompt
 liquidshell status        # show rice + app versions
 ```
@@ -117,7 +113,7 @@ liquidshell status        # show rice + app versions
 ├── hypr/           ← hyprland.lua, keybinds.lua, rules.lua, hyprlock.conf, scripts/
 ├── waybar/         ← config.jsonc, style.css, scripts/
 ├── quickshell/     ← shell.qml, hyprcheatsheet/  (lean)
-│                    + external clones: mylauncher/ (launcher), DynaLinux/, hypr-lens/
+│                    + external clones: mylauncher/ (launcher), hypr-lens/
 │                    + custom overlay: custom/hypr-lens/record.sh
 ├── rofi/           ← config.rasi, cheatsheet.rasi, colors.rasi
 ├── wlogout/        ← layout, style.css, icons/
@@ -166,13 +162,6 @@ wallpaper change, then reloads waybar. Run
 Locking (`SUPER+Tab`, idle lock) pauses video wallpapers and resumes on
 unlock via `hypr/scripts/lock.sh`.
 
-### VPN (CypherGate)
-
-`SUPER+SHIFT+V` launches CypherGate; `SUPER+ALT+V` shows the exit IP.
-Waybar has a small VPN pill next to RAM (toggle with the installer prompt,
-or `touch ~/.config/waybar/vpn-enabled`). `hypr/scripts/vpn-guard.sh`
-watches `cyphergated` and restarts + notifies if it drops.
-
 ### Config validation
 
 Before `hyprctl reload`, run `hypr/scripts/check-config.sh` — it type-checks
@@ -182,19 +171,7 @@ scope) before deploying anything.
 
 ### Quickshell externals
 
-`install.sh` keeps `liquidshell` lean — `DynaLinux`, `launcher` (`mylauncher` path), and `hypr-lens` are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` or `liquidshell update` to `git pull` them.
-
-### Dynamic Island (DynaLinux)
-
-Launches automatically with Quickshell. IPC commands:
-
-```bash
-quickshell ipc dynalinux idle
-quickshell ipc dynalinux volume 50 false
-quickshell ipc dynalinux brightness 75
-quickshell ipc dynalinux notify "Title" "Body" "App"
-quickshell ipc dynalinux demo
-```
+`install.sh` keeps `liquidshell` lean — `launcher` (`mylauncher` path) and `hypr-lens` are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` or `liquidshell update` to `git pull` them.
 
 ### Display Settings
 
@@ -248,7 +225,6 @@ Edit `hypr/hyprland.lua` to change:
 - [Hyprland](https://hyprland.org)
 - [Quickshell](https://quickshell.outfoxxed.me)
 - [Launcher](https://github.com/Ali120B/launcher) — app launcher (`superlauncher` IPC)
-- [DynaLinux](https://github.com/Ali120B/dynalinux)
 - [hypr-lens](https://github.com/Ali120B/hypr-lens)
 - [skwd-wall](https://github.com/liixini/skwd-wall)
 - [Nerd Fonts](https://www.nerdfonts.com)

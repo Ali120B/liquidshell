@@ -48,8 +48,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("pkill -f '[m]pvpaper'; pkill -f '[a]www-daemon'")
     -- Wallpaper-driven theming (matugen -> hypr borders + waybar)
     hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-theme.sh --watch")
-    -- VPN guard: notify + restart cyphergated if it drops
-    hl.exec_cmd("bash $HOME/.config/hypr/scripts/vpn-guard.sh")
 end)
 
 -------------------------------

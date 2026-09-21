@@ -44,10 +44,6 @@ hl.bind("SUPER + SHIFT + R", hl.dsp.global("quickshell:regionRecordWithSound"))
 -- Clipboard (clipse in floating transparent terminal)
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -o window.padding.x=12 -o window.padding.y=12 -o background_opacity=0.7 -e clipse"))
 
--- VPN (CypherGate VPNGate client)
-hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("cyphergate"))
-hl.bind("SUPER + ALT + V", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/vpn-ip.sh"))
-
 -- Keyboard layout
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("hyprctl switchxkblayout current next"))
 

@@ -5,7 +5,7 @@
     "height": 30,
     "spacing": 4,
 
-    "modules-left": ["hyprland/workspaces", "cpu", "memory", "custom/vpn"],
+    "modules-left": ["hyprland/workspaces", "cpu", "memory"],
     "modules-center": ["clock"],
     "modules-right": ["mpris", "pulseaudio", "custom/power"],
 
@@ -36,14 +36,6 @@
         "tooltip-format": "{used} / {total}GiB",
         "interval": 2
     },
-
-    "custom/vpn": {
-        "exec": "$HOME/.config/waybar/scripts/vpn-status.sh",
-        "return-type": "json",
-        "interval": 10,
-        "on-click": "cyphergate"
-    },
-
     "clock": {
         "format": "{:%a %d %b  %H:%M}",
         "tooltip-format": "<tt>{calendar}</tt>"

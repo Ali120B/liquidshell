@@ -77,11 +77,10 @@ backup_config() {
 }
 
 # ── Selection menu ──────────────────────────────────────────────────────────
-# Everything installs. Only DynaLinux (dynamic island) is optional.
 declare -A COMPONENTS=(
     [hyprland]="Hyprland core config (hyprland.lua/conf, keybinds, rules, scripts, hyprlock)"
     [waybar]="Waybar status bar (config, style, GPU script)"
-    [quickshell]="Quickshell (cheatsheet + external: launcher, DynaLinux, hypr-lens)"
+    [quickshell]="Quickshell (cheatsheet + external: launcher, hypr-lens)"
     [rofi]="Rofi application launcher (theme, cheatsheet theme)"
     [wlogout]="Wlogout logout screen (layout, style, icons)"
     [clipse]="Clipse clipboard manager (config, theme)"
@@ -90,7 +89,6 @@ declare -A COMPONENTS=(
 )
 
 SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
-INSTALL_DYNALINUX="no"
 
 print_banner() {
     clear
@@ -99,7 +97,7 @@ print_banner() {
 
     ╔═══════════════════════════════════════════════════╗
     ║       ali2's Hyprland Rice - Installer            ║
-    ║  DynaLinux · Waybar · Quickshell · Hypr-Lens     ║
+    ║  Waybar · Quickshell · Hypr-Lens                 ║
     ╚═══════════════════════════════════════════════════╝
 
 EOF
@@ -114,19 +112,7 @@ component_menu() {
     for key in "${keys[@]}"; do
         echo -e "  ${GREEN}[✓]${NC} ${BOLD}$key${NC}  — ${COMPONENTS[$key]}"
     done
-    echo ""
-    echo -e "  ${YELLOW}[?]${NC} ${BOLD}DynaLinux${NC}  — Dynamic Island (optional)"
-    echo ""
-
     SELECTED=("${keys[@]}")
-
-    read -rp "$(echo -e "${CYAN}Install DynaLinux dynamic island? [y/N]: ${NC}")" want_dyna
-    if [[ "${want_dyna,,}" == "y" ]]; then
-        INSTALL_DYNALINUX="yes"
-        info "DynaLinux will be installed"
-    else
-        info "Skipping DynaLinux"
-    fi
 
     echo ""
     info "Selected components: ${BOLD}${SELECTED[*]}${NC}"
@@ -280,53 +266,6 @@ install_sung() {
     fi
 }
 
-# ── CypherGate VPN ────────────────────────────────────────────────────────────
-install_cyphergate() {
-    header "CypherGate VPN"
-
-    if command -v cyphergate &>/dev/null; then
-        ok "CypherGate already installed"
-    else
-        echo -e "CypherGate is a Linux-first VPNGate client (SUPER+SHIFT+V to launch).\n"
-        echo "  Repo: https://github.com/Cypher-Monarch/CypherGate"
-        echo ""
-        read -rp "$(echo -e "${CYAN}Install CypherGate? [Y/n]: ${NC}")" install_cg
-        if [[ "${install_cg,,}" != "n" ]]; then
-            case "$DISTRO_ID" in
-                arch|cachyos|manjaro|endeavouros|garuda)
-                    info "Importing CypherGate release signing key..."
-                    gpg --keyserver hkps://keys.openpgp.org \
-                        --recv-keys 9ED87F6065033606670941AAC6C9B498797C980E 2>/dev/null \
-                        || warn "GPG key import failed (install may still work if key is cached)"
-                    if command -v yay &>/dev/null; then
-                        yay -S --needed --noconfirm cyphergatevpn-bin || warn "yay install failed"
-                    elif command -v paru &>/dev/null; then
-                        paru -S --needed --noconfirm cyphergatevpn-bin || warn "paru install failed"
-                    else
-                        warn "No AUR helper (yay/paru) found. Install manually: https://github.com/Cypher-Monarch/CypherGate"
-                    fi
-                    ;;
-                *)
-                    info "On non-Arch distros use the upstream installer:"
-                    echo "  curl -fsSL https://github.com/Cypher-Monarch/CypherGate/releases/latest/download/install.sh > install.sh"
-                    echo "  sudo bash install.sh"
-                    ;;
-            esac
-        else
-            warn "Skipping CypherGate (SUPER+SHIFT+V will not work without it)"
-        fi
-    fi
-
-    # Backend daemon owns the VPN connection lifecycle; make sure it runs
-    if command -v cyphergate &>/dev/null; then
-        if sudo systemctl enable --now cyphergated.service 2>/dev/null; then
-            ok "cyphergated service enabled and started"
-        else
-            warn "Could not enable cyphergated.service (start it manually: sudo systemctl enable --now cyphergated.service)"
-        fi
-    fi
-}
-
 # ── Install fonts ────────────────────────────────────────────────────────────
 install_fonts() {
     header "Fonts"
@@ -435,14 +374,7 @@ deploy_configs() {
 @define-color outline #918f9a;
 EOF
                 fi
-                read -rp "$(echo -e "${CYAN}Show VPN status in waybar (next to RAM)? [Y/n]: ${NC}")" show_vpn
-                if [[ "${show_vpn,,}" != "n" ]]; then
-                    touch "$HOME/.config/waybar/vpn-enabled"
-                    ok "VPN waybar module enabled"
-                else
-                    rm -f "$HOME/.config/waybar/vpn-enabled"
-                    info "VPN waybar module disabled (create ~/.config/waybar/vpn-enabled to show it)"
-                fi
+
                 ok "Waybar config installed"
                 ;;
             quickshell)
@@ -470,20 +402,6 @@ EOF
                     fi
                 fi
 
-                # DynaLinux dynamic island (optional, Ali120B/dynalinux)
-                if [[ "$INSTALL_DYNALINUX" == "yes" ]]; then
-                    clone_or_pull "https://github.com/Ali120B/dynalinux.git" "$HOME/.config/quickshell/DynaLinux"
-                    # dynalinux repo nests shell under quickshell/ — flatten to expected path
-                    if [[ -f "$HOME/.config/quickshell/DynaLinux/quickshell/shell.qml" ]]; then
-                        cp -r "$HOME/.config/quickshell/DynaLinux/quickshell/"* "$HOME/.config/quickshell/DynaLinux/" 2>/dev/null || true
-                    fi
-                    if [[ -f "$HOME/.config/quickshell/DynaLinux/quickshell/DynaLinux/shell.qml" ]]; then
-                        cp -r "$HOME/.config/quickshell/DynaLinux/quickshell/DynaLinux/"* "$HOME/.config/quickshell/DynaLinux/" 2>/dev/null || true
-                    fi
-                    ok "DynaLinux installed"
-                else
-                    info "Skipping DynaLinux (not selected)"
-                fi
 
                 # Clean old retired pickers
                 rm -rf "$HOME/.config/quickshell/hyprquickpaper" "$HOME/.config/quickshell/hyprquickpaper-live"
@@ -647,17 +565,12 @@ print_summary() {
     echo "  Library default: ~/Pictures/Wallpapers (change in Settings > Sources)"
     echo ""
 
-    if [ "$INSTALL_DYNALINUX" == "yes" ]; then
-        echo -e "  ${GREEN}✓${NC} DynaLinux dynamic island"
-        echo ""
-    fi
 
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
         echo -e "${YELLOW}Note:${NC} quickshell, skwd-wall and Sung are installed automatically (AUR / source build):"
         echo "  quickshell: https://quickshell.outfoxxed.me"
         echo "  skwd-wall:  yay -S skwd-wall-v2-bin (https://github.com/liixini/skwd-wall)"
         echo "  Sung:       built from https://github.com/yappologistic/Sung into ~/.local/bin/sung"
-        echo "  CypherGate: yay -S cyphergatevpn-bin (https://github.com/Cypher-Monarch/CypherGate, SUPER+SHIFT+V)"
         echo ""
     fi
 }
@@ -681,8 +594,6 @@ main() {
 
     install_skwd_wall
     install_sung
-    install_cyphergate
-
     install_fonts
     deploy_configs
     post_install
