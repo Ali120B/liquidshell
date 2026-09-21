@@ -12,20 +12,11 @@ is_video_live() {
 }
 
 decide() {
-    local json addr floating fullscreen
-    json=$(hyprctl activewindow -j 2>/dev/null) || { echo play; return; }
-    addr=$(echo "$json" | jq -r '.address // empty')
-    if [[ -z "$addr" ]]; then
-        echo play
-        return
-    fi
-    floating=$(echo "$json" | jq -r '.floating // false')
-    fullscreen=$(echo "$json" | jq -r '.fullscreen // 0')
-    if [[ "$fullscreen" != "0" || "$floating" == "false" ]]; then
-        echo stop
-    else
-        echo play
-    fi
+    local out
+    # Single hyprctl + jq: empty => no window => play, else check floating/fullscreen
+    out=$(hyprctl activewindow -j 2>/dev/null | jq -r 'if (.address // empty) == "" then "play" elif (.fullscreen // 0) != 0 or (.floating // false) == false then "stop" else "play" end' 2>/dev/null) || { echo play; return; }
+    # jq returns play/stop directly, fallback to play on empty
+    [[ -n "$out" ]] && echo "$out" || echo play
 }
 
 apply() {
@@ -41,6 +32,11 @@ apply() {
 }
 
 while true; do
+    # Only poll Hyprland when a live wallpaper is actually running
+    if ! is_video_live; then
+        sleep 5
+        continue
+    fi
     apply "$(decide)"
     sleep 2
 done
