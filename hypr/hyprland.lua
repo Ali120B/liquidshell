@@ -46,8 +46,7 @@ hl.on("hyprland.start", function()
     -- (awww/mpvpaper, retired) from fighting it.
     hl.exec_cmd("systemctl --user start skwd-walld")
     hl.exec_cmd("pkill -f '[m]pvpaper'; pkill -f '[a]www-daemon'")
-    -- Wallpaper-driven theming (matugen -> hypr borders + waybar)
-    hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-theme.sh --watch")
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-autopause.sh")
 end)
 
 -------------------------------

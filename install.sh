@@ -385,10 +385,9 @@ EOF
                 cp "$RICE_DIR/quickshell/shell.qml" "$HOME/.config/quickshell/"
 
                 # External modules — pulled from their own repos (keeps liquidshell lean)
-                # mylauncher (Ali120B/launcher) -> ~/.config/quickshell/mylauncher
-                clone_or_pull "https://github.com/Ali120B/launcher.git" "$HOME/.config/quickshell/mylauncher"
-                # Speed up launcher open (200ms -> 120ms)
-                sed -i 's/duration: 200/duration: 120/' "$HOME/.config/quickshell/mylauncher/shell.qml" 2>/dev/null || true
+                # mylauncher (fast, minimal — kept vendored)
+                mkdir -p "$HOME/.config/quickshell/mylauncher"
+                cp "$RICE_DIR/quickshell/mylauncher/"*.qml "$HOME/.config/quickshell/mylauncher/"
                 rm -rf "$HOME/.config/quickshell/superlauncher"
 
                 # hypr-lens (try Ali120B fork, fallback to vendored custom if needed)
