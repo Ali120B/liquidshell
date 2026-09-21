@@ -41,12 +41,9 @@ hl.on("hyprland.start", function()
 
     hl.exec_cmd("quickshell -n -d")
     hl.exec_cmd("quickshell -n -d -p $HOME/.config/quickshell/mylauncher")
-    -- Wallpapers: skwd-walld is systemd-managed (skwd-walld.service) and
-    -- restores the last wallpaper itself. Keep other wallpaper daemons
-    -- (awww/mpvpaper, retired) from fighting it.
-    hl.exec_cmd("systemctl --user start skwd-walld")
-    hl.exec_cmd("pkill -f '[m]pvpaper'; pkill -f '[a]www-daemon'")
-    hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-autopause.sh")
+    hl.exec_cmd("awww-daemon")
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/restore-wallpaper.sh")
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/live-wallpaper-autopause.sh")
 end)
 
 -------------------------------

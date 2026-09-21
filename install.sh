@@ -131,7 +131,7 @@ install_core_deps() {
         hyprland hyprlock hypridle hyprpaper hyprpicker
         waybar wlogout rofi-wayland dunst
         kitty foot clipse wl-clipboard
-        ffmpeg socat wf-recorder
+        awww mpvpaper ffmpeg socat wf-recorder
         satty swappy tesseract tesseract-data-eng
         brightnessctl playerctl
         hyprpolkitagent
@@ -178,45 +178,6 @@ install_quickshell_deps() {
                 info "Please install quickshell manually: https://quickshell.outfoxxed.me"
                 ;;
         esac
-    fi
-}
-
-# ── Skwd-wall (wallpaper manager) ─────────────────────────────────────────────
-install_skwd_wall() {
-    header "Skwd-wall Wallpaper Manager"
-
-    if command -v skwd-wall-v2 &>/dev/null; then
-        ok "skwd-wall already installed"
-    else
-        echo -e "Wallpapers are handled by ${BOLD}skwd-wall${NC} (SUPER+W picker, SUPER+SHIFT+W mixer).\n"
-        read -rp "$(echo -e "${CYAN}Install skwd-wall? [Y/n]: ${NC}")" install_skwd
-        if [[ "${install_skwd,,}" != "n" ]]; then
-            case "$DISTRO_ID" in
-                arch|cachyos|manjaro|endeavouros|garuda)
-                    if command -v yay &>/dev/null; then
-                        yay -S --needed --noconfirm skwd-wall-v2-bin || warn "yay install failed"
-                    elif command -v paru &>/dev/null; then
-                        paru -S --needed --noconfirm skwd-wall-v2-bin || warn "paru install failed"
-                    else
-                        warn "No AUR helper (yay/paru) found. Install manually: https://github.com/liixini/skwd-wall"
-                    fi
-                    ;;
-                *)
-                    info "skwd-wall packages are distro-specific. See https://github.com/liixini/skwd-wall#installation"
-                    ;;
-            esac
-        else
-            warn "Skipping skwd-wall (wallpaper keybinds will not work without it)"
-        fi
-    fi
-
-    # Daemon is systemd-managed; make sure it is enabled and running
-    if command -v skwd-wall-v2 &>/dev/null; then
-        if systemctl --user enable --now skwd-walld.service 2>/dev/null; then
-            ok "skwd-walld service enabled and started"
-        else
-            warn "Could not enable skwd-walld.service (start it manually: systemctl --user start skwd-walld)"
-        fi
     fi
 }
 
@@ -390,6 +351,16 @@ EOF
                 cp "$RICE_DIR/quickshell/mylauncher/"*.qml "$HOME/.config/quickshell/mylauncher/"
                 rm -rf "$HOME/.config/quickshell/superlauncher"
 
+                # hyprquickpaper (static picker, SUPER+W) and live (video, SUPER+SHIFT+W)
+                mkdir -p "$HOME/.config/quickshell/hyprquickpaper"
+                cp "$RICE_DIR/quickshell/hyprquickpaper/"* "$HOME/.config/quickshell/hyprquickpaper/" 2>/dev/null || true
+                mkdir -p "$HOME/.config/quickshell/hyprquickpaper-live"
+                cp "$RICE_DIR/quickshell/hyprquickpaper-live/"* "$HOME/.config/quickshell/hyprquickpaper-live/" 2>/dev/null || true
+                # Fix __HOME__ placeholders
+                for f in "$HOME/.config/quickshell/hyprquickpaper/config.json" "$HOME/.config/quickshell/hyprquickpaper-live/config.json"; do
+                    [[ -f "$f" ]] && sed -i "s|__HOME__|$HOME|g" "$f" || true
+                done
+
                 # hypr-lens (try Ali120B fork, fallback to vendored custom if needed)
                 # We keep a custom record.sh overlay in quickshell/custom/hypr-lens
                 if ! clone_or_pull "https://github.com/Ali120B/hypr-lens.git" "$HOME/.config/quickshell/hypr-lens" 2>/dev/null; then
@@ -401,9 +372,6 @@ EOF
                     fi
                 fi
 
-
-                # Clean old retired pickers
-                rm -rf "$HOME/.config/quickshell/hyprquickpaper" "$HOME/.config/quickshell/hyprquickpaper-live"
 
                 # hyprcheatsheet (kept vendored)
                 mkdir -p "$HOME/.config/quickshell/hyprcheatsheet"
@@ -477,51 +445,16 @@ EOF
 post_install() {
     header "Post-Install Setup"
 
-    # Wallpaper library for skwd-wall
+    # Wallpaper dirs for hyprquickpaper (static + live)
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall" "$HOME/Pictures/Wallpapers_clean"
-        # If /home/wallpaper exists (shared, may contain dotfiles), link only images to clean dir
-        if [[ -d "/home/wallpaper" && -z "$(ls -A "$HOME/Pictures/Wallpapers_clean/" 2>/dev/null)" ]]; then
-            info "Linking wallpapers from /home/wallpaper -> ~/Pictures/Wallpapers_clean (clean, no dotfiles)..."
-            for ext in jpg jpeg png webp JPG JPEG PNG WEBP; do
-                for f in /home/wallpaper/*."$ext"; do
-                    [[ -f "$f" ]] && ln -sf "$f" "$HOME/Pictures/Wallpapers_clean/$(basename "$f")" 2>/dev/null || true
-                done
-            done
-            ok "Linked $(ls "$HOME/Pictures/Wallpapers_clean" 2>/dev/null | wc -l) wallpapers to clean dir"
+        mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall"
+        if [[ -z "$(ls -A "$HOME/Pictures/Wallpapers/" 2>/dev/null)" ]]; then
+            info "No wallpapers found in ~/Pictures/Wallpapers/"
+            echo "  Add images there, or set a custom path in hyprquickpaper config.json"
+            echo "  Videos in ~/Pictures/Livewall/ work too (SUPER+SHIFT+W live picker)"
         fi
-        if [[ -z "$(ls -A "$HOME/Pictures/Wallpapers/" 2>/dev/null)" && -z "$(ls -A "$HOME/Pictures/Wallpapers_clean/" 2>/dev/null)" ]]; then
-            info "No wallpapers found. Add images to ~/Pictures/Wallpapers/ or set a custom path in skwd-wall Settings > Sources."
-        fi
-        # Tune skwd-wall for speed (reduce CPU): maxThumbJobs 1, no auto-optimize, long polling
-        if [[ -f "$HOME/.config/skwd-wall-v2/config.json" ]]; then
-            python3 <<'PYEOF' 2>/dev/null || true
-import json, pathlib
-p=pathlib.Path.home()/".config/skwd-wall-v2/config.json"
-try:
-    d=json.loads(p.read_text())
-    # Fix polluted /home/wallpaper (contains .config) -> use clean dir
-    if d.get("paths", {}).get("wallpaper") == "/home/wallpaper":
-        d["paths"]["wallpaper"] = str(pathlib.Path.home() / "Pictures/Wallpapers_clean")
-    d.setdefault("performance", {})["maxThumbJobs"]=1
-    d["performance"]["autoOptimizeImages"]=False
-    d.setdefault("library", {})["pollingIntervalSeconds"]=3600
-    d["library"]["pollingFallback"]=False
-    p.write_text(json.dumps(d, indent=2))
-except: pass
-PYEOF
-        fi
-        # Low-priority wrapper for semantic indexer (skwd-lens) to keep desktop snappy
-        if [[ -f "/usr/bin/skwd-lens.real" ]]; then
-            : # already wrapped
-        elif [[ -f "/usr/bin/skwd-lens" && ! -L "/usr/bin/skwd-lens" ]]; then
-            echo "2025" | sudo -S mv /usr/bin/skwd-lens /usr/bin/skwd-lens.real 2>/dev/null || true
-            echo "2025" | sudo -S tee /usr/bin/skwd-lens >/dev/null <<'EOSWRAP'
-#!/bin/bash
-exec nice -n 15 /usr/bin/skwd-lens.real "$@"
-EOSWRAP
-            echo "2025" | sudo -S chmod +x /usr/bin/skwd-lens 2>/dev/null || true
-        fi
+        # hyprquickpaper thumbnail caches
+        mkdir -p "$HOME/.cache/quickshell/thumbs" "$HOME/.cache/quickshell/thumbs-live" 2>/dev/null || true
     fi
 
     # hyprland.conf is always a symlink to hyprland.lua (single source, no drift)
@@ -556,19 +489,17 @@ print_summary() {
     echo "  3. Use SUPER+T for terminal, SUPER+. for app launcher"
     echo "  4. Run 'hyprctl reload' to apply config changes"
     echo ""
-    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W skwd-wall picker · SUPER+SHIFT+W mixer · F1 cheatsheet"
+    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W wallpapers · SUPER+SHIFT+W live wallpapers · F1 cheatsheet"
     echo ""
-    echo -e "${BOLD}Wallpaper (skwd-wall):${NC}"
-    echo "  SUPER+W        picker (images + video + Wallpaper Engine scenes)"
-    echo "  SUPER+SHIFT+W  mixer (open directly)"
-    echo "  Library default: ~/Pictures/Wallpapers (change in Settings > Sources)"
+    echo -e "${BOLD}Wallpaper (hyprquickpaper):${NC}"
+    echo "  SUPER+W        static (images in ~/Pictures/Wallpapers)"
+    echo "  SUPER+SHIFT+W  live video (videos in ~/Pictures/Livewall)"
     echo ""
 
 
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
         echo -e "${YELLOW}Note:${NC} quickshell, skwd-wall and Sung are installed automatically (AUR / source build):"
         echo "  quickshell: https://quickshell.outfoxxed.me"
-        echo "  skwd-wall:  yay -S skwd-wall-v2-bin (https://github.com/liixini/skwd-wall)"
         echo "  Sung:       built from https://github.com/yappologistic/Sung into ~/.local/bin/sung"
         echo ""
     fi
@@ -598,7 +529,6 @@ main() {
         install_quickshell_deps
     fi
 
-    install_skwd_wall
     install_sung
     install_fonts
     deploy_configs

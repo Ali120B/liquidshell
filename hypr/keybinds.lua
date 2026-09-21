@@ -15,7 +15,7 @@ hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofi -show emoji -theme-str 'me
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("skwd-wall-v2"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/notifications.sh"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("notify-send 'Test Notification' 'This is a test notification from Hyprland' -a hyprland -u normal"))
 
@@ -27,8 +27,8 @@ hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacit
 -- Toggle waybar
 hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("sh -c 'pgrep -x waybar >/dev/null && pkill waybar || nohup waybar >/dev/null 2>&1 &'"))
 
--- Wallpaper mixer (images + video + Wallpaper Engine scenes via skwd-wall)
-hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("skwd-wall-v2 --mixer"))
+-- Live wallpaper picker (video + gif, same feel as static picker)
+hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper-live"))
 
 -- Screenshots
 hl.bind("Print", hl.dsp.exec_cmd("grim - | wl-copy"), { locked = true })
