@@ -39,8 +39,7 @@ do_update(){
     warn "No $RICE_DIR git repo found"
   fi
   # 2. Pull external quickshell modules (lean)
-  clone_or_pull "https://github.com/Ali120B/launcher.git" "$HOME/.config/quickshell/mylauncher"
-  # launcher ipc target is superlauncher, keep path mylauncher for compat
+  # mylauncher is vendored (fast), not external
   clone_or_pull "https://github.com/Ali120B/hypr-lens.git" "$HOME/.config/quickshell/hypr-lens"
   # custom record.sh overlay
   if [[ -f "$RICE_DIR/quickshell/custom/hypr-lens/scripts/videos/record.sh" ]]; then

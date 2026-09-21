@@ -13,7 +13,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 | Component | Description |
 |-----------|-------------|
 | **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity |
-| **Launcher** | One-shot app launcher (`SUPER`, `superlauncher` IPC) — [Ali120B/launcher](https://github.com/Ali120B/launcher) |
+| **Launcher** | One-shot app launcher (`SUPER`, `mylauncher` IPC) |
 | **hypr-lens** | Region screenshot, OCR, search, recording — [Ali120B/hypr-lens](https://github.com/Ali120B/hypr-lens) (custom `record.sh` overlay) |
 | **Waybar** | Frosted glass top bar — workspaces, CPU, RAM, clock, mpris, volume, power button |
 | **skwd-wall** | Wallpaper manager — picker + mixer, images / video / Wallpaper Engine scenes |
@@ -101,7 +101,7 @@ The installer will:
 ### Update
 
 ```bash
-liquidshell update        # pull all repos (rice + launcher/hypr-lens/Sung) and redeploy (overwrites)
+liquidshell update        # pull all repos (rice + hypr-lens/Sung) and redeploy (overwrites)
 liquidshell update --yes  # no prompt
 liquidshell status        # show rice + app versions
 ```
@@ -113,7 +113,7 @@ liquidshell status        # show rice + app versions
 ├── hypr/           ← hyprland.lua, keybinds.lua, rules.lua, hyprlock.conf, scripts/
 ├── waybar/         ← config.jsonc, style.css, scripts/
 ├── quickshell/     ← shell.qml, hyprcheatsheet/  (lean)
-│                    + external clones: mylauncher/ (launcher), hypr-lens/
+│                    + external clone: hypr-lens/ (mylauncher vendored)
 │                    + custom overlay: custom/hypr-lens/record.sh
 ├── rofi/           ← config.rasi, cheatsheet.rasi, colors.rasi
 ├── wlogout/        ← layout, style.css, icons/
@@ -171,7 +171,7 @@ scope) before deploying anything.
 
 ### Quickshell externals
 
-`install.sh` keeps `liquidshell` lean — `launcher` (`mylauncher` path) and `hypr-lens` are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` or `liquidshell update` to `git pull` them.
+`install.sh` keeps `liquidshell` lean — `hypr-lens` (mylauncher vendored) are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` or `liquidshell update` to `git pull` them.
 
 ### Display Settings
 
@@ -224,7 +224,6 @@ Edit `hypr/hyprland.lua` to change:
 
 - [Hyprland](https://hyprland.org)
 - [Quickshell](https://quickshell.outfoxxed.me)
-- [Launcher](https://github.com/Ali120B/launcher) — app launcher (`superlauncher` IPC)
 - [hypr-lens](https://github.com/Ali120B/hypr-lens)
 - [skwd-wall](https://github.com/liixini/skwd-wall)
 - [Nerd Fonts](https://www.nerdfonts.com)

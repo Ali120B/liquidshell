@@ -1,4 +1,4 @@
-# superlauncherrevamped
+# mylauncher
 
 A minimal, wofi/rofi-style app launcher for [Quickshell](https://quickshell.org/) on Hyprland.
 No animations, no clutter — tap SUPER, type, launch.
@@ -18,26 +18,15 @@ No animations, no clutter — tap SUPER, type, launch.
 - Hyprland
 - Quickshell 0.3.x
 
-## Install
-
-```bash
-# Clone into your quickshell configs
-git clone https://github.com/Ali120B/superlauncherrevamped ~/.config/quickshell/mylauncher
-```
-
-Add the daemon to your Hyprland autostart (`hyprland.lua`):
+## Autostart (Hyprland)
 
 ```lua
 hl.exec_cmd("quickshell -n -d -p $HOME/.config/quickshell/mylauncher")
 ```
 
-Bind `SUPER`-tap to toggle it (`keybinds.lua`):
-
 ```lua
-hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("quickshell ipc -p " .. home .. "/.config/quickshell/mylauncher call mylauncher toggle"), { release = true })
+hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("quickshell ipc -p $HOME/.config/quickshell/mylauncher call mylauncher toggle"), { release = true })
 ```
-
-Same glass blur as other overlays (`rules.lua`):
 
 ```lua
 hl.layer_rule({
@@ -47,8 +36,6 @@ hl.layer_rule({
 })
 ```
 
-Reload Hyprland and tap `SUPER`.
-
 ## IPC
 
 ```bash
@@ -57,8 +44,3 @@ quickshell ipc -p ~/.config/quickshell/mylauncher call mylauncher open
 quickshell ipc -p ~/.config/quickshell/mylauncher call mylauncher hide
 quickshell ipc -p ~/.config/quickshell/mylauncher call mylauncher isVisible
 ```
-
-## Credit
-
-- alibashmail2010@yahoo.com
-- GitHub: [Ali120B](https://github.com/Ali120B)

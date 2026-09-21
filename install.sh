@@ -80,7 +80,7 @@ backup_config() {
 declare -A COMPONENTS=(
     [hyprland]="Hyprland core config (hyprland.lua/conf, keybinds, rules, scripts, hyprlock)"
     [waybar]="Waybar status bar (config, style, GPU script)"
-    [quickshell]="Quickshell (cheatsheet + external: launcher, hypr-lens)"
+    [quickshell]="Quickshell (cheatsheet + hypr-lens, mylauncher vendored)"
     [rofi]="Rofi application launcher (theme, cheatsheet theme)"
     [wlogout]="Wlogout logout screen (layout, style, icons)"
     [clipse]="Clipse clipboard manager (config, theme)"
