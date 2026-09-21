@@ -21,9 +21,9 @@ hl.layer_rule({
     ignore_alpha = 0.15,
 })
 
--- Same glass blur for the superlauncher overlay
+-- Same glass blur for the mylauncher overlay
 hl.layer_rule({
-    match = { namespace = "quickshell:superlauncher" },
+    match = { namespace = "quickshell:mylauncher" },
     blur = true,
     ignore_alpha = 0.15,
 })
@@ -39,7 +39,7 @@ hl.layer_rule({
 hl.window_rule({
     name = "opacity-apps",
     match = {
-        class = "^(kitty|xed|thunar|zen|zen-browser|discord|codium|GeForceNOW|obsidian|Spotify|org.pulseaudio.pavucontrol|com.github.johnfactotum.Foliate)$",
+        class = "^(foot|kitty|xed|thunar|nautilus|org.gnome.Nautilus|zen|zen-browser|discord|codium|GeForceNOW|obsidian|Spotify|org.pulseaudio.pavucontrol|com.github.johnfactotum.Foliate)$",
     },
     opacity = window_opacity .. " override " .. window_inactive_opacity .. " override 1.0 override",
 })

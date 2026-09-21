@@ -1,4 +1,5 @@
 import QtQuick
+import QtCore
 import Quickshell
 import Quickshell.Io
 
@@ -27,9 +28,12 @@ Item {
         }
     }
 
+    // Fixed path (not statePath) so usage history survives config moves.
+    property string historyPath: String(StandardPaths.writableLocation(StandardPaths.HomeLocation)).replace(/^file:\/\//, "") + "/.local/state/mylauncher/history.json"
+
     FileView {
         id: historyFile
-        path: Quickshell.statePath("superlauncher/history.json")
+        path: root.historyPath
         printErrors: false
         onLoadedChanged: {
             if (loaded)
@@ -59,7 +63,7 @@ Item {
         try {
             historyFile.setText(JSON.stringify(next))
         } catch (e) {
-            console.warn("[Superlauncher] Failed to save history:", e)
+            console.warn("[mylauncher] Failed to save history:", e)
         }
     }
 

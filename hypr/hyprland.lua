@@ -20,8 +20,8 @@ hl.monitor({
 -- in the same Lua state, same as $vars used to be shared via `source` in hyprlang.
 
 mainMod    = "SUPER"
-terminal   = "kitty"
-menu       = "quickshell ipc -p $HOME/.config/quickshell/superlauncher call superlauncher toggle"
+terminal   = "foot"
+menu       = "quickshell ipc -p $HOME/.config/quickshell/mylauncher call mylauncher toggle"
 fileManager = "kitty --class spf -e spf"
 browser    = "zen-browser"
 
@@ -37,15 +37,19 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("pkill -9 mako; dunst")
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("clipse -listen")
-    hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
+    hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 
     hl.exec_cmd("quickshell -n -d")
-    hl.exec_cmd("sleep 3 && quickshell -n -d -p $HOME/.config/quickshell/superlauncher")
+    hl.exec_cmd("quickshell -n -d -p $HOME/.config/quickshell/mylauncher")
     -- Wallpapers: skwd-walld is systemd-managed (skwd-walld.service) and
     -- restores the last wallpaper itself. Keep other wallpaper daemons
     -- (awww/mpvpaper, retired) from fighting it.
     hl.exec_cmd("systemctl --user start skwd-walld")
     hl.exec_cmd("pkill -f '[m]pvpaper'; pkill -f '[a]www-daemon'")
+    -- Wallpaper-driven theming (matugen -> hypr borders + waybar)
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-theme.sh --watch")
+    -- VPN guard: notify + restart cyphergated if it drops
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/vpn-guard.sh")
 end)
 
 -------------------------------
@@ -60,6 +64,7 @@ hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("GTK_THEME", "adw-gtk3-dark")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
 hl.env("XDG_SESSION_DESKTOP", "Hyprland")
+hl.env("TERMINAL", "foot")
 
 ---------------
 ---- INPUT ----

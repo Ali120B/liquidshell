@@ -1,7 +1,7 @@
 # Super = Windows key
 
 <span foreground="#7AA2F7" weight="bold" size="large">Apps</span>
-<span foreground="#7AA2F7">SUPER</span>             Superlauncher             <span foreground="#7AA2F7">SUPER + .</span>        Emoji Menu
+<span foreground="#7AA2F7">SUPER</span>             Mylauncher                <span foreground="#7AA2F7">SUPER + .</span>        Emoji Menu
 <span foreground="#7AA2F7">SUPER + T</span>         Terminal                    <span foreground="#7AA2F7">SUPER + E</span>        File Manager (spf)
 <span foreground="#7AA2F7">SUPER + B</span>         Browser (zen)
 <span foreground="#7AA2F7">SUPER + SHIFT + F</span>  File Search (fzf)

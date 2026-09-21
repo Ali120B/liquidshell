@@ -5,15 +5,15 @@
 
 local home = os.getenv("HOME")
 
--- Launchers (SUPER-tap toggles superlauncher, a quickshell config)
-hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("quickshell ipc -p " .. home .. "/.config/quickshell/superlauncher call superlauncher toggle"), { release = true })
+-- Launchers (SUPER-tap toggles mylauncher, a quickshell daemon)
+hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("quickshell ipc -p " .. home .. "/.config/quickshell/mylauncher call mylauncher toggle"), { release = true })
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofi -show emoji -theme-str 'message { enabled: false; }'"))
 
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind("SUPER + Tab", hl.dsp.exec_cmd("hyprlock"))
+hl.bind("SUPER + Tab", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("skwd-wall-v2"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/notifications.sh"))
@@ -46,6 +46,7 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -o window.paddi
 
 -- VPN (CypherGate VPNGate client)
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("cyphergate"))
+hl.bind("SUPER + ALT + V", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/vpn-ip.sh"))
 
 -- Keyboard layout
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("hyprctl switchxkblayout current next"))
