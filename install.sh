@@ -53,6 +53,19 @@ install_packages() {
     esac
 }
 
+# ── Clone or pull a git repo (idempotent) ───────────────────────────────────
+clone_or_pull() {
+    local repo="$1" dest="$2"
+    if [[ -d "$dest/.git" ]]; then
+        info "Updating $dest from $repo ..."
+        git -C "$dest" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Pull failed for $dest"
+    else
+        info "Cloning $repo -> $dest ..."
+        rm -rf "$dest"
+        git clone --depth 1 "$repo" "$dest" 2>&1 | sed 's/^/  /' || warn "Clone failed for $repo"
+    fi
+}
+
 # ── Backup existing configs ─────────────────────────────────────────────────
 backup_config() {
     local src="$HOME/.config/$1"
@@ -68,7 +81,7 @@ backup_config() {
 declare -A COMPONENTS=(
     [hyprland]="Hyprland core config (hyprland.lua/conf, keybinds, rules, scripts, hyprlock)"
     [waybar]="Waybar status bar (config, style, GPU script)"
-    [quickshell]="Quickshell (mylauncher, cheatsheet, hypr-lens)"
+    [quickshell]="Quickshell (cheatsheet + external: launcher, DynaLinux, hypr-lens, notifcenter)"
     [rofi]="Rofi application launcher (theme, cheatsheet theme)"
     [wlogout]="Wlogout logout screen (layout, style, icons)"
     [clipse]="Clipse clipboard manager (config, theme)"
@@ -436,60 +449,58 @@ EOF
                 info "Installing Quickshell configs..."
                 mkdir -p "$HOME/.config/quickshell"
 
-                # Main shell.qml
+                # Main shell.qml (minimal, imports hypr-lens which is cloned externally)
                 cp "$RICE_DIR/quickshell/shell.qml" "$HOME/.config/quickshell/"
 
-                # mylauncher (SUPER one-shot launcher daemon)
-                mkdir -p "$HOME/.config/quickshell/mylauncher"
-                cp "$RICE_DIR/quickshell/mylauncher/"*.qml "$HOME/.config/quickshell/mylauncher/"
-                # Remove superseded superlauncher if a previous install left it
+                # External modules — pulled from their own repos (keeps liquidshell lean)
+                # mylauncher (Ali120B/launcher) -> ~/.config/quickshell/mylauncher
+                clone_or_pull "https://github.com/Ali120B/launcher.git" "$HOME/.config/quickshell/mylauncher"
                 rm -rf "$HOME/.config/quickshell/superlauncher"
 
-                # Wallpapers are handled by skwd-wall (SUPER+W picker,
-                # SUPER+SHIFT+W mixer). The old hyprquickpaper pickers are
-                # retired (see quickshell/*.retired for rollback).
-                # Ensure no retired picker gets redeployed.
-                rm -rf "$HOME/.config/quickshell/hyprquickpaper" "$HOME/.config/quickshell/hyprquickpaper-live"
+                # hypr-lens (try Ali120B fork, fallback to vendored custom if needed)
+                # We keep a custom record.sh overlay in quickshell/custom/hypr-lens
+                if ! clone_or_pull "https://github.com/Ali120B/hypr-lens.git" "$HOME/.config/quickshell/hypr-lens" 2>/dev/null; then
+                    # Fallback: keep existing hypr-lens if present, else warn
+                    if [[ ! -d "$HOME/.config/quickshell/hypr-lens" ]]; then
+                        warn "hypr-lens clone failed and no existing install found"
+                    else
+                        info "hypr-lens: keeping existing install"
+                    fi
+                fi
 
-                # hyprcheatsheet (F1 cheatsheet)
-                mkdir -p "$HOME/.config/quickshell/hyprcheatsheet"
-                cp "$RICE_DIR/quickshell/hyprcheatsheet/"*.qml "$HOME/.config/quickshell/hyprcheatsheet/"
-
-                # DynaLinux (Dynamic Island, optional)
+                # DynaLinux dynamic island (optional, Ali120B/dynalinux)
                 if [[ "$INSTALL_DYNALINUX" == "yes" ]]; then
-                    mkdir -p "$HOME/.config/quickshell/DynaLinux/modules/dynalinux"
-                    cp "$RICE_DIR/quickshell/DynaLinux/shell.qml" "$HOME/.config/quickshell/DynaLinux/"
-                    cp "$RICE_DIR/quickshell/DynaLinux/modules/dynalinux/"*.qml \
-                       "$HOME/.config/quickshell/DynaLinux/modules/dynalinux/"
+                    clone_or_pull "https://github.com/Ali120B/dynalinux.git" "$HOME/.config/quickshell/DynaLinux"
+                    # dynalinux repo nests shell under quickshell/ — flatten to expected path
+                    if [[ -f "$HOME/.config/quickshell/DynaLinux/quickshell/shell.qml" ]]; then
+                        cp -r "$HOME/.config/quickshell/DynaLinux/quickshell/"* "$HOME/.config/quickshell/DynaLinux/" 2>/dev/null || true
+                    fi
+                    if [[ -f "$HOME/.config/quickshell/DynaLinux/quickshell/DynaLinux/shell.qml" ]]; then
+                        cp -r "$HOME/.config/quickshell/DynaLinux/quickshell/DynaLinux/"* "$HOME/.config/quickshell/DynaLinux/" 2>/dev/null || true
+                    fi
                     ok "DynaLinux installed"
                 else
                     info "Skipping DynaLinux (not selected)"
                 fi
 
-                # hypr-lens (screenshot/OCR/recording)
-                local lens_dst="$HOME/.config/quickshell/hypr-lens"
-                mkdir -p "$lens_dst"
-                find "$RICE_DIR/quickshell/hypr-lens" -type f \( -name "*.qml" -o -name "*.js" -o -name "qmldir" \) | while read f; do
-                    local rel="${f#$RICE_DIR/quickshell/hypr-lens/}"
-                    mkdir -p "$lens_dst/$(dirname "$rel")"
-                    cp "$f" "$lens_dst/$rel"
-                done
-                # qmldir
-                if [ -f "$RICE_DIR/quickshell/hypr-lens/modules/common/qmldir" ]; then
-                    mkdir -p "$lens_dst/modules/common"
-                    cp "$RICE_DIR/quickshell/hypr-lens/modules/common/qmldir" "$lens_dst/modules/common/"
-                fi
+                # NotifCenter — translucent top-right history (Ali120B/notifcenter)
+                clone_or_pull "https://github.com/Ali120B/notifcenter.git" "$HOME/.config/quickshell/notifcenter"
+                ok "NotifCenter installed"
 
-                # record.sh backend (SUPER+R screen recording shells out to
-                # ~/.local/share/hypr-lens/scripts/videos/record.sh)
-                if [ -f "$RICE_DIR/quickshell/hypr-lens/scripts/videos/record.sh" ]; then
+                # Clean old retired pickers
+                rm -rf "$HOME/.config/quickshell/hyprquickpaper" "$HOME/.config/quickshell/hyprquickpaper-live"
+
+                # hyprcheatsheet (kept vendored)
+                mkdir -p "$HOME/.config/quickshell/hyprcheatsheet"
+                cp "$RICE_DIR/quickshell/hyprcheatsheet/"*.qml "$HOME/.config/quickshell/hyprcheatsheet/"
+
+                # Custom overrides — not full vendoring, just patches
+                if [[ -f "$RICE_DIR/quickshell/custom/hypr-lens/scripts/videos/record.sh" ]]; then
                     mkdir -p "$HOME/.local/share/hypr-lens/scripts/videos"
-                    cp "$RICE_DIR/quickshell/hypr-lens/scripts/videos/record.sh" \
+                    cp "$RICE_DIR/quickshell/custom/hypr-lens/scripts/videos/record.sh" \
                        "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
                     chmod +x "$HOME/.local/share/hypr-lens/scripts/videos/record.sh"
-                    ok "hypr-lens record backend installed"
-                else
-                    warn "hypr-lens record.sh missing from repo, SUPER+R will not work"
+                    ok "hypr-lens record backend (custom) installed"
                 fi
 
                 ok "Quickshell configs installed"

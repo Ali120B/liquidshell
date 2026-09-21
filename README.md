@@ -1,6 +1,6 @@
 # LiquidShell
 
-A full Hyprland rice with Quickshell Dynamic Island, frosted glass Waybar, wallpaper picker, region screenshot/OCR/recording, and an interactive one-shot installer.
+A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, region screenshot/OCR/recording, translucent notification center, and an interactive installer. Quickshell modules are pulled from their own repos (lean, no vendoring).
 
 ![Hyprland](https://img.shields.io/badge/Hyperland-blue?style=flat-square&logo=hyprland)
 ![Quickshell](https://img.shields.io/badge/Quickshell-purple?style=flat-square)
@@ -13,12 +13,14 @@ A full Hyprland rice with Quickshell Dynamic Island, frosted glass Waybar, wallp
 | Component | Description |
 |-----------|-------------|
 | **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity |
-| **DynaLinux** | Quickshell Dynamic Island — volume HUD, media controls, timer, battery, weather, notifications |
+| **NotifCenter** | Translucent top-right notification center (dunst history, blur, `SUPER+N`) — [Ali120B/notifcenter](https://github.com/Ali120B/notifcenter) |
+| **Launcher** | One-shot app launcher (`SUPER`, `superlauncher` IPC) — [Ali120B/launcher](https://github.com/Ali120B/launcher) |
+| **DynaLinux** | Dynamic Island — HUD, media, timer, battery (optional) — [Ali120B/dynalinux](https://github.com/Ali120B/dynalinux) |
+| **hypr-lens** | Region screenshot, OCR, search, recording — [Ali120B/hypr-lens](https://github.com/Ali120B/hypr-lens) (custom `record.sh` overlay) |
 | **Waybar** | Frosted glass top bar — workspaces, CPU, RAM, clock, mpris, volume, power button |
 | **skwd-wall** | Wallpaper manager — picker + mixer, images / video / Wallpaper Engine scenes |
 | **Sung** | Native Material 3 music player (auto-installed by `install.sh`) |
 | **CypherGate** | VPNGate client — `SUPER+SHIFT+V`, waybar pill, auto-restart guard |
-| **hypr-lens** | Region screenshot, OCR, screen recording, reverse image search, color picker |
 | **Rofi** | Themed app launcher + keybind cheatsheet viewer |
 | **Wlogout** | Circular button logout screen (shutdown, reboot, logout) |
 | **Clipse** | Clipboard manager with custom pink/blue theme |
@@ -66,7 +68,7 @@ Suggested: fullscreen desktop, waybar closeup, DynaLinux island expanded, rofi l
 | `SUPER + SHIFT + V` | VPN (CypherGate) |
 | `SUPER + ALT + V` | Show exit IP + VPN state |
 | `SUPER + CTRL + W` | Toggle Waybar |
-| `SUPER + N` | Notification History |
+| `SUPER + N` | Notification Center (translucent, `dunst` history) |
 | `SUPER + O` | Opacity Menu |
 | `SUPER + Tab` | Lock Screen (pauses video wallpaper) |
 | `SUPER + Escape` | Logout Menu |
@@ -106,7 +108,9 @@ The installer will:
 ~/.config/
 ├── hypr/           ← hyprland.lua, keybinds.lua, rules.lua, hyprlock.conf, scripts/
 ├── waybar/         ← config.jsonc, style.css, scripts/
-├── quickshell/     ← shell.qml, mylauncher/, DynaLinux/, hypr-lens/
+├── quickshell/     ← shell.qml, hyprcheatsheet/  (lean)
+│                    + external clones: notifcenter/, mylauncher/ (launcher), DynaLinux/, hypr-lens/
+│                    + custom overlay: custom/hypr-lens/record.sh
 ├── rofi/           ← config.rasi, cheatsheet.rasi, colors.rasi
 ├── wlogout/        ← layout, style.css, icons/
 ├── clipse/         ← config.json, custom_theme.json
@@ -167,6 +171,19 @@ Before `hyprctl reload`, run `hypr/scripts/check-config.sh` — it type-checks
 the Lua (`luac`), lint-checks the scripts (`bash -n`), validates waybar's
 `config.jsonc` and flags duplicate keybinds. `install.sh` runs it (repo
 scope) before deploying anything.
+
+### Notification Center (NotifCenter)
+
+`SUPER+N` toggles a translucent top-right panel (`quickshell notifcenter`).
+- Frosted glass with Hyprland `layerrule blur` (`quickshell:notifcenter`)
+- Reads `dunstctl history` live, `Clear All` and `DND` toggle
+- Keeps `dunst` for popups — this is history only
+- Autostart: `quickshell -n -d -p ~/.config/quickshell/notifcenter`
+- Repo: [Ali120B/notifcenter](https://github.com/Ali120B/notifcenter), pulled by `install.sh`
+
+### Quickshell externals
+
+`install.sh` keeps `liquidshell` lean — `DynaLinux`, `launcher` (`mylauncher` path), `hypr-lens`, and `notifcenter` are cloned from their own repos, not vendored. Only `hyprcheatsheet` and `shell.qml` plus tiny custom overlays (e.g. `custom/hypr-lens/record.sh`) stay in-repo. Re-run `install.sh` to `git pull` them.
 
 ### Dynamic Island (DynaLinux)
 
@@ -231,8 +248,10 @@ Edit `hypr/hyprland.lua` to change:
 
 - [Hyprland](https://hyprland.org)
 - [Quickshell](https://quickshell.outfoxxed.me)
+- [NotifCenter](https://github.com/Ali120B/notifcenter) — translucent notification center
+- [Launcher](https://github.com/Ali120B/launcher) — app launcher (`superlauncher` IPC)
 - [DynaLinux](https://github.com/Ali120B/dynalinux)
-- [hypr-lens](https://github.com/Xavist0/hypr-lens)
+- [hypr-lens](https://github.com/Ali120B/hypr-lens)
 - [skwd-wall](https://github.com/liixini/skwd-wall)
 - [Nerd Fonts](https://www.nerdfonts.com)
 

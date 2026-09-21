@@ -35,6 +35,18 @@ hl.layer_rule({
     ignore_alpha = 0.15,
 })
 
+-- Translucent blur for notification center (top-right slide)
+hl.layer_rule({
+    match = { namespace = "quickshell:notifcenter" },
+    blur = true,
+    ignore_alpha = 0.15,
+})
+hl.layer_rule({
+    match = { namespace = "quickshell:notifcenter-dim" },
+    blur = false,
+    ignore_alpha = 0.2,
+})
+
 -- Opacity rule for your regular apps
 hl.window_rule({
     name = "opacity-apps",
