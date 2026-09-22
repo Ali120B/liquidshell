@@ -83,7 +83,7 @@ PanelWindow {
         width: 200
         height: 34
         radius: 17
-        color: "#ffffff99"
+        color: "#ffffff66"
         border.width: 0
 
         RowLayout {

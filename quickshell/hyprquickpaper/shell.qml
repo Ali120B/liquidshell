@@ -70,7 +70,7 @@ PanelWindow {
         id: folderModel
         folder: "file://" + configs.wallpaper_path
         showDirs: false
-        nameFilters: ["*.png", "*.jpg"]
+        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
         sortField: FolderListModel.Name
     }
 
