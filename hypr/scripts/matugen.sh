@@ -5,7 +5,16 @@ WALL="$1"
 [[ -f "$WALL" ]] || exit 0
 # NOTE: --prefer saturation picks the wallpaper's dominant hue (e.g. green stays
 # green). --prefer darkness biased toward dark tones and washed hues out to blue.
-matugen image "$WALL" --prefer saturation -m dark >/dev/null 2>&1 || matugen image "$WALL" --prefer saturation >/dev/null 2>&1 || true
+# BUT near-monochrome wallpapers (e.g. pure black, sat ~0) have no hue to keep,
+# so saturation preference grabs a random vivid color (usually blue). Detect
+# that case and theme from neutral gray instead.
+SAT=$(magick "$WALL" -colorspace HSL -channel S -separate +channel -format "%[fx:mean]" info: 2>/dev/null || echo 1)
+if awk "BEGIN {exit !(($SAT + 0) < 0.08)}"; then
+  # Monochrome: tonal-spot from gray still invents blue, monochrome stays neutral.
+  matugen color hex "#8b9198" -m dark -t scheme-monochrome >/dev/null 2>&1 || true
+else
+  matugen image "$WALL" --prefer saturation -m dark >/dev/null 2>&1 || matugen image "$WALL" --prefer saturation >/dev/null 2>&1 || true
+fi
 # Hyprland: strip # (scheme expects without #)
 if [[ -f "$HOME/.config/hypr/scheme/current.lua" ]]; then
   sed -i 's/"#\([0-9a-fA-F]\{6\}\)"/"\1"/g' "$HOME/.config/hypr/scheme/current.lua" 2>/dev/null || true
