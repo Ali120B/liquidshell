@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # Restores last wallpaper on login: live video via mpvpaper, image via hyprpaper (0% idle).
 # On-demand: only starts mpvpaper if last was video; hyprpaper is started by Hyprland.
-sleep 1
+sleep 3 # let hyprpaper come up
 
 LAST=$(cat "$HOME/.cache/quickshell/last-live-wallpaper" 2>/dev/null)
+
+# Wait for hyprpaper socket (up to 10s)
+for i in $(seq 1 10); do
+  hyprctl hyprpaper listactive >/dev/null 2>&1 && break
+  sleep 1
+done
 
 start_video() {
     hyprctl hyprpaper unload all 2>/dev/null || true

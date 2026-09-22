@@ -488,14 +488,14 @@ post_install() {
         echo "Installed browsers: $(command -v zen-browser &>/dev/null && echo -n 'zen-browser '; command -v firefox &>/dev/null && echo -n 'firefox '; command -v chromium &>/dev/null && echo -n 'chromium '; echo)"
         read -rp "$(echo -e "${CYAN}Default terminal [foot/alacritty/kitty or leave empty to keep current]: ${NC}")" new_term
         if [[ -n "$new_term" ]]; then
-            sed -i "s/^terminal.*=.*"[^"]*"/terminal   = \"$new_term\"/" "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || true
-            sed -i "s|^terminal.*=.*".*"|terminal   = \"$new_term\"|" "$RICE_DIR/hypr/hyprland.lua" 2>/dev/null || true
+            sed -i 's|^terminal .*|terminal   = "'$new_term'"|' "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || true
+            sed -i 's|^terminal .*|terminal   = "'$new_term'"|' "$RICE_DIR/hypr/hyprland.lua" 2>/dev/null || true
             ok "Terminal set to $new_term"
         fi
         read -rp "$(echo -e "${CYAN}Default browser [zen-browser/firefox/chromium or leave empty]: ${NC}")" new_browser
         if [[ -n "$new_browser" ]]; then
-            sed -i "s/^browser.*=.*"[^"]*"/browser    = \"$new_browser\"/" "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || true
-            sed -i "s|^browser.*=.*".*"|browser    = \"$new_browser\"|" "$RICE_DIR/hypr/hyprland.lua" 2>/dev/null || true
+            sed -i 's|^browser .*|browser    = "'$new_browser'"|' "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || true
+            sed -i 's|^browser .*|browser    = "'$new_browser'"|' "$RICE_DIR/hypr/hyprland.lua" 2>/dev/null || true
             ok "Browser set to $new_browser"
         fi
     fi

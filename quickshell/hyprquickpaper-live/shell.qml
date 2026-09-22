@@ -186,7 +186,7 @@ PanelWindow {
                     cache: false
                     smooth: true
 
-                    source: "file://" + configs.cache_path + fileName
+                    source: "file://" + configs.cache_path + fileName + ".jpg"
 
                     // Decode once at the largest size this image will ever be shown at
                     // (the active/zoomed size), rather than tracking the animating
