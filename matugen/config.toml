@@ -29,3 +29,7 @@ output_path = "~/.config/dunst/dunstrc"
 [templates.quickshell]
 input_path = "templates/quickshell-colors.json"
 output_path = "~/.config/quickshell/matugen-colors.json"
+
+[templates.clipse]
+input_path = "templates/clipse.json"
+output_path = "~/.config/clipse/custom_theme.json"

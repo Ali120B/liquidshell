@@ -65,12 +65,12 @@ window#waybar {
 
 #workspaces button:hover {
     color: #ffffff;
-    background-color: rgba(122, 162, 247, 0.2);
+    background-color: alpha(@primary, 0.2);
 }
 
 #workspaces button.active {
-    color: rgba(255, 255, 255, 0.85);
-    background-color: rgba(255, 255, 255, 0.15);
+    color: @on_primary;
+    background-color: @primary;
     font-weight: bold;
 }
 
