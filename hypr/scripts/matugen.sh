@@ -3,7 +3,9 @@
 set -euo pipefail
 WALL="$1"
 [[ -f "$WALL" ]] || exit 0
-matugen image "$WALL" --prefer darkness -m dark >/dev/null 2>&1 || matugen image "$WALL" --prefer darkness >/dev/null 2>&1 || true
+# NOTE: --prefer saturation picks the wallpaper's dominant hue (e.g. green stays
+# green). --prefer darkness biased toward dark tones and washed hues out to blue.
+matugen image "$WALL" --prefer saturation -m dark >/dev/null 2>&1 || matugen image "$WALL" --prefer saturation >/dev/null 2>&1 || true
 # Hyprland: strip # (scheme expects without #)
 if [[ -f "$HOME/.config/hypr/scheme/current.lua" ]]; then
   sed -i 's/"#\([0-9a-fA-F]\{6\}\)"/"\1"/g' "$HOME/.config/hypr/scheme/current.lua" 2>/dev/null || true
