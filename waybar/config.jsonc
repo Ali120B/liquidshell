@@ -19,7 +19,7 @@
             "default": ""
         },
         "persistent-workspaces": {
-            "*": 4
+            "*": 1
         },
         "on-click": "activate",
         "sort-by-number": true,
