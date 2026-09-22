@@ -165,15 +165,15 @@ install_quickshell_deps() {
 
     echo -e "Quickshell modules require ${BOLD}quickshell${NC} and some extra packages.\n"
     echo "  • quickshell (from AUR or build from source)"
-    echo "  • material-symbols-ttf (icon font)"
+    echo "  • ttf-material-symbols-variable (icon font)"
     echo "  • noto-fonts (text font)"
     echo ""
     read -rp "$(echo -e "${CYAN}Install quickshell extra deps? [Y/n]: ${NC}")" install_qs
     if [[ "${install_qs,,}" != "n" ]]; then
         case "$DISTRO_ID" in
             arch|cachyos|manjaro|endeavouros|garuda)
-                sudo pacman -S --needed --noconfirm material-symbols-ttf noto-fonts
-                info "Quickshell must be installed separately (AUR / source build)"
+                sudo pacman -S --needed --noconfirm ttf-material-symbols-variable noto-fonts 2>&1 | tail -n 20 || warn "Some quickshell deps failed (try: sudo pacman -S ttf-material-symbols-variable noto-fonts)"
+                info "Quickshell must be installed separately (AUR: quickshell-bin): yay -S quickshell-bin"
                 ;;
             *)
                 info "Please install quickshell manually: https://quickshell.outfoxxed.me"
