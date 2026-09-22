@@ -18,4 +18,11 @@ ShellRoot {
     RegionSelector {
         id: regionSelector
     }
+
+    // Bottom-center translucent OSD for volume/brightness (matugen-themed)
+    // Trigger: quickshell ipc -p ~/.config/quickshell call osd showVolume 42
+    Loader {
+        source: "./osd.qml"
+        active: true
+    }
 }
