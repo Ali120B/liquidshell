@@ -69,7 +69,7 @@ PanelWindow {
         id: folderModel
         folder: "file://" + configs.wallpaper_path
         showDirs: false
-        nameFilters: ["*.mp4", "*.webm", "*.mkv", "*.mov", "*.gif", "*.png", "*.jpg", "*.jpeg"]
+        nameFilters: ["*.mp4", "*.webm", "*.mkv", "*.mov"]
         sortField: FolderListModel.Name
         onCountChanged: {
             if (count > 0 && !list.settled)

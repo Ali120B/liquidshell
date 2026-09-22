@@ -473,6 +473,49 @@ post_install() {
         chmod +x "$HOME/.local/bin/liquidshell" 2>/dev/null || true
         ok "liquidshell command installed to ~/.local/bin/liquidshell (run: liquidshell update)"
     fi
+
+    # Default apps chooser (browser + terminal) — keep it minimal
+    if [[ -f "$HOME/.config/hypr/hyprland.lua" ]]; then
+        header "Default Apps"
+        echo -e "Current: ${BOLD}terminal=$terminal  browser=$browser${NC} (from hyprland.lua)"
+        echo "Installed terminals: $(command -v foot &>/dev/null && echo -n 'foot '; command -v alacritty &>/dev/null && echo -n 'alacritty '; command -v kitty &>/dev/null && echo -n 'kitty '; echo)"
+        echo "Installed browsers: $(command -v zen-browser &>/dev/null && echo -n 'zen-browser '; command -v firefox &>/dev/null && echo -n 'firefox '; command -v chromium &>/dev/null && echo -n 'chromium '; echo)"
+        read -rp "$(echo -e "${CYAN}Default terminal [foot/alacritty/kitty or leave empty to keep current]: ${NC}")" new_term
+        if [[ -n "$new_term" ]]; then
+            sed -i "s/^terminal.*=.*"[^"]*"/terminal   = \"$new_term\"/" "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || true
+            sed -i "s|^terminal.*=.*".*"|terminal   = \"$new_term\"|" "$RICE_DIR/hypr/hyprland.lua" 2>/dev/null || true
+            ok "Terminal set to $new_term"
+        fi
+        read -rp "$(echo -e "${CYAN}Default browser [zen-browser/firefox/chromium or leave empty]: ${NC}")" new_browser
+        if [[ -n "$new_browser" ]]; then
+            sed -i "s/^browser.*=.*"[^"]*"/browser    = \"$new_browser\"/" "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || true
+            sed -i "s|^browser.*=.*".*"|browser    = \"$new_browser\"|" "$RICE_DIR/hypr/hyprland.lua" 2>/dev/null || true
+            ok "Browser set to $new_browser"
+        fi
+    fi
+
+    # Wallpaper locations — ask after defaults
+    header "Wallpaper Locations"
+    local cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
+    local cur_live=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || echo "$HOME/Pictures/Livewall")
+    echo -e "Current static: ${BOLD}$cur_wall${NC}"
+    echo -e "Current live:   ${BOLD}$cur_live${NC}"
+    read -rp "$(echo -e "${CYAN}Static wallpaper dir (leave empty to keep): ${NC}")" new_wall
+    if [[ -n "$new_wall" ]]; then
+        new_wall=$(eval echo "$new_wall")
+        mkdir -p "$new_wall" 2>/dev/null || true
+        jq --arg p "$new_wall" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper/config.json" > /tmp/hqp.json 2>/dev/null && mv /tmp/hqp.json "$HOME/.config/quickshell/hyprquickpaper/config.json" || true
+        jq --arg p "$new_wall" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper/config.json" > /tmp/hqp2.json 2>/dev/null && mv /tmp/hqp2.json "$RICE_DIR/quickshell/hyprquickpaper/config.json" 2>/dev/null || true
+        ok "Static wallpaper dir set to $new_wall"
+    fi
+    read -rp "$(echo -e "${CYAN}Live wallpaper dir (leave empty to keep): ${NC}")" new_live
+    if [[ -n "$new_live" ]]; then
+        new_live=$(eval echo "$new_live")
+        mkdir -p "$new_live" 2>/dev/null || true
+        jq --arg p "$new_live" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl.json 2>/dev/null && mv /tmp/hqpl.json "$HOME/.config/quickshell/hyprquickpaper-live/config.json" || true
+        jq --arg p "$new_live" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl2.json 2>/dev/null && mv /tmp/hqpl2.json "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || true
+        ok "Live wallpaper dir set to $new_live"
+    fi
 }
 
 # ── Final summary ────────────────────────────────────────────────────────────

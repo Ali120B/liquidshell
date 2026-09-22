@@ -8,7 +8,6 @@ PanelWindow {
     id: main
 
     // ---- Easy-to-edit settings ----
-    property int speed: 5000          // scroll animation speed
     property int animDuration: 100    // ms for scroll animation
     property real zoomScale: 0.8        // scale of the tile at screen center (peak)
     property real edgeScale: 0.3      // scale of tiles at the screen edges (trough)
@@ -70,8 +69,12 @@ PanelWindow {
         id: folderModel
         folder: "file://" + configs.wallpaper_path
         showDirs: false
-        nameFilters: ["*.png", "*.jpg"]
+        nameFilters: ["*.png", "*.jpg", "*.jpeg", "*.webp"]
         sortField: FolderListModel.Name
+        onCountChanged: {
+            if (count > 0 && !list.settled)
+                settleTimer.restart()
+        }
     }
 
     ListView {
@@ -85,79 +88,85 @@ PanelWindow {
         clip: true
         cacheBuffer: 400
 
-        property int selectedIndex: 0
+        // Selection-centered carousel: the current item is pinned to the
+        // screen center, so the dock-zoom peak and the selection always
+        // agree - even when the whole row fits on screen and there is
+        // nothing to free-scroll.
+        highlightRangeMode: settled ? ListView.StrictlyEnforceRange : ListView.NoHighlightRange
+        preferredHighlightBegin: centerLead
+        preferredHighlightEnd: centerLead
+        highlightMoveDuration: main.animDuration
+
+        // Startup gate: load transients (model/config arriving, tiles morphing
+        // to final size) can park contentX off-center. Hold enforcement off
+        // until geometry settles, then pin the current item exactly.
+        property bool settled: false
+        onCurrentIndexChanged: settled = true
+
+        Timer {
+            id: settleTimer
+            interval: 400
+            repeat: false
+            onTriggered: {
+                list.positionViewAtIndex(list.currentIndex, ListView.Center)
+                list.settled = true
+            }
+        }
+
+        // ponytail: fixed-width spacers (no contentWidth feedback). Header is
+        // exact so the first item starts centered; footer has slack so the
+        // last item can reach center too.
+        header: Item { width: list.centerLead; height: 1 }
+        footer: Item { width: list.centerLead + 40; height: 1 }
+
         property real tileWidth: width / configs.number_of_pictures - 10
-        property real viewportCenterX: width / 2
+        // Leading space that puts the current item at screen center when pinned.
+        property real centerLead: width / 2 - tileWidth * main.zoomScale / 2
 
         function clampIndex(i) {
             return Math.max(0, Math.min(i, count - 1))
         }
 
-        function clampX(x) {
-            return Math.max(0, Math.min(x, contentWidth - width))
-        }
-
         function activateCurrent() {
-            const path = folderModel.get(selectedIndex, "filePath")
+            const path = folderModel.get(currentIndex, "filePath")
             Quickshell.execDetached(["bash", Quickshell.shellPath("commands.sh"), path])
             Qt.quit()
         }
 
-        function ensureVisibleAnimated(i) {
-            const step = tileWidth + spacing
-            const itemStart = i * step
-            const itemEnd = itemStart + tileWidth + 20
-
-            if (itemStart < contentX)
-                contentX = clampX(itemStart)
-            else if (itemEnd > contentX + width)
-                contentX = clampX(itemStart - (width - step))
-        }
-
-        // Moves the selection by `delta` tiles, animating at `speedMultiplier`x speed
-        function moveSelection(delta, speedMultiplier) {
-            anim.v = main.speed * speedMultiplier
-            selectedIndex = clampIndex(selectedIndex + delta)
-            ensureVisibleAnimated(selectedIndex)
-        }
-
-        Behavior on contentX {
-            SmoothedAnimation {
-                id: anim
-                property int v: main.speed
-                duration: main.animDuration
-            }
+        // Moves the selection by `delta` tiles; the view glides the new
+        // current item to the center automatically.
+        function moveSelection(delta) {
+            currentIndex = clampIndex(currentIndex + delta)
         }
 
         delegate: Item {
             id: delegateItem
             height: 500
-            property bool active: index === list.selectedIndex
+            property bool active: index === list.currentIndex
 
-            // Base (unscaled) slot width. Used to work out where this tile currently sits
-            // on screen for the magnification curve below. Deliberately NOT derived from
-            // this item's own (dynamic) width - if it were, width would depend on position
-            // which would depend on width, i.e. a binding loop.
             readonly property real baseWidth: list.tileWidth
 
-            // --- Dock-style magnification: scale depends on on-screen position ---
-            // One binding instead of several chained ones - list.contentX already animates
-            // smoothly (SmoothedAnimation below), so this recomputes every frame during
-            // scroll anyway; no need for extra Behavior/NumberAnimation layered on top of
-            // it (that was two animations fighting over the same value, which is what was
-            // causing the sluggish feel).
+            // --- Dock-style magnification, driven by SELECTION distance ---
+            // Position-driven zoom fed layout back into itself (widths shift
+            // x, x shifts zoom) and oscillated against the scroll clamp at
+            // the row ends. Distance from currentIndex is layout-independent,
+            // so widths settle instantly and the ends can't flicker.
             property real scaleFactor: {
-                const centerX = x - list.contentX + baseWidth / 2
-                const frac = Math.min(1, Math.abs(centerX - list.viewportCenterX) / list.viewportCenterX)
-                const t = 1 - frac * frac * (3 - 2 * frac) // smoothstep falloff
-                return main.edgeScale + (main.zoomScale - main.edgeScale) * t
+                const d = Math.abs(index - list.currentIndex)
+                const t = Math.max(0, 1 - d / 2.5)
+                const s = t * t * (3 - 2 * t) // smoothstep falloff
+                return main.edgeScale + (main.zoomScale - main.edgeScale) * s
             }
 
             // This IS the delegate's real layout width, so as it grows, ListView pushes
             // every following tile further along - real spacing, not an overlapping overlay.
-            // No Behavior here: it already tracks contentX's smooth animation 1:1, and tiles
-            // never overlap in this layout, so there's nothing to visually smooth over.
+            // Width animates alongside the contentX glide so tiles swell/shrink smoothly.
+            // Safe: widths converge to fixed per-selection values (no layout feedback).
             width: baseWidth * scaleFactor
+
+            Behavior on width {
+                NumberAnimation { duration: main.animDuration; easing.type: Easing.InOutQuad }
+            }
 
             Item {
                 id: content
@@ -166,6 +175,10 @@ PanelWindow {
                 // Height scale uses the same factor but caps at 1.0 - the row is already
                 // full window height, so growing past that would just get clipped.
                 height: delegateItem.height * Math.min(1, delegateItem.scaleFactor)
+
+                Behavior on height {
+                    NumberAnimation { duration: main.animDuration; easing.type: Easing.InOutQuad }
+                }
 
                 Text {
                     id: alt
@@ -186,7 +199,7 @@ PanelWindow {
                     cache: false
                     smooth: true
 
-                    source: "file://" + configs.cache_path + fileName
+                    source: "file://" + configs.cache_path + fileName + ".jpg"
 
                     // Decode once at the largest size this image will ever be shown at
                     // (the active/zoomed size), rather than tracking the animating
@@ -228,17 +241,30 @@ PanelWindow {
 
                     transform: Shear { xFactor: main.skewFactor }
                 }
+
+                // Video badge so live videos are distinguishable in the grid
+                Text {
+                    z: 11
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    anchors.margins: 10
+                    text: "▶"
+                    color: "#B0FFFFFF"
+                    font.pixelSize: 18
+                    visible: /\.(mp4|webm|mkv|mov)$/i.test(fileName)
+                }
             }
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: true
 
-                onEntered: list.selectedIndex = index
-                onClicked: list.activateCurrent()
+                onClicked: {
+                    list.currentIndex = index
+                    list.activateCurrent()
+                }
 
                 onWheel: function(wheel) {
-                    list.flick(-wheel.angleDelta.y * 8, 0)
+                    list.moveSelection(wheel.angleDelta.y < 0 ? 1 : -1)
                     wheel.accepted = true
                 }
             }
@@ -249,16 +275,16 @@ PanelWindow {
 
             switch (event.key) {
             case Qt.Key_J:
-                moveSelection(1, 1)
+                moveSelection(1)
                 break
             case Qt.Key_K:
-                moveSelection(-1, 1)
+                moveSelection(-1)
                 break
             case Qt.Key_D:
-                moveSelection(big, big)
+                moveSelection(big)
                 break
             case Qt.Key_U:
-                moveSelection(-big, big)
+                moveSelection(-big)
                 break
             case Qt.Key_Space:
             case Qt.Key_Return:

@@ -17,9 +17,9 @@ PanelWindow {
     color: "transparent"
     anchors { bottom: true; left: true; right: true }
     margins { bottom: 40 }
-    implicitWidth: 320
-    implicitHeight: 56
-    // Center the OSD horizontally
+    implicitWidth: 260
+    implicitHeight: 48
+    // Center the OSD horizontally — small bottom-center
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell:osd"
@@ -80,49 +80,41 @@ PanelWindow {
 
     Rectangle {
         anchors.centerIn: parent
-        width: parent.width - 20
-        height: 48
-        radius: 16
+        width: parent.width - 16
+        height: 42
+        radius: 14
         color: "#1e1e2eCC"
-        border.color: "#ffffff14"
+        border.color: "#ffffff0F"
         border.width: 1
-        // Matugen will recolor via waybar colors.css, but OSD uses fixed translucent + matugen primary for bar
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 12
+            anchors.margins: 10
             spacing: 10
             Text {
                 text: osd.icon
                 color: "#cdd6f4"
-                font.pixelSize: 18
+                font.pixelSize: 16
                 font.family: "JetBrainsMono Nerd Font"
-            }
-            Text {
-                text: osd.label
-                color: "#a6adc8"
-                font.pixelSize: 11
-                Layout.preferredWidth: 70
             }
             Rectangle {
                 Layout.fillWidth: true
-                height: 6
-                radius: 3
+                height: 4
+                radius: 2
                 color: "#313244"
                 Rectangle {
                     width: parent.width * (osd.value / 100)
                     height: parent.height
                     radius: parent.radius
-                    color: "#89b4fa"
-                    // Matugen primary will be applied via waybar reload, but OSD bar uses primary
+                    color: "#cdd6f4"
                 }
             }
             Text {
                 text: osd.value + "%"
                 color: "#cdd6f4"
                 font.pixelSize: 11
-                font.weight: Font.DemiBold
-                Layout.preferredWidth: 36
+                font.weight: Font.Medium
+                Layout.preferredWidth: 32
                 horizontalAlignment: Text.AlignRight
             }
         }
