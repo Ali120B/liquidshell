@@ -455,10 +455,14 @@ post_install() {
     # Wallpaper dirs for hyprquickpaper (static + live)
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
         mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall"
-        if [[ -z "$(ls -A "$HOME/Pictures/Wallpapers/" 2>/dev/null)" ]]; then
-            info "No wallpapers found in ~/Pictures/Wallpapers/"
+        cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
+        # Expand __HOME__ if needed
+        cur_wall_expanded=$(echo "$cur_wall" | sed "s|__HOME__|$HOME|g")
+        if [[ -z "$(ls -A "$cur_wall_expanded" 2>/dev/null)" ]]; then
+            info "No wallpapers found in $cur_wall_expanded"
             echo "  Add images there, or set a custom path in hyprquickpaper config.json"
-            echo "  Videos in ~/Pictures/Livewall/ work too (SUPER+SHIFT+W live picker)"
+            cur_live_expanded=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null | sed "s|__HOME__|$HOME|g" || echo "$HOME/Pictures/Livewall")
+            echo "  Live videos in $cur_live_expanded work too (SUPER+SHIFT+W)"
         fi
         # hyprquickpaper thumbnail caches
         mkdir -p "$HOME/.cache/quickshell/thumbs" "$HOME/.cache/quickshell/thumbs-live" 2>/dev/null || true
@@ -477,7 +481,9 @@ post_install() {
     # Default apps chooser (browser + terminal) — keep it minimal
     if [[ -f "$HOME/.config/hypr/hyprland.lua" ]]; then
         header "Default Apps"
-        echo -e "Current: ${BOLD}terminal=$terminal  browser=$browser${NC} (from hyprland.lua)"
+        cur_term=$(grep -oP '^terminal\s*=\s*"\K[^"]+' "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || echo "foot")
+        cur_browser=$(grep -oP '^browser\s*=\s*"\K[^"]+' "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || echo "zen-browser")
+        echo -e "Current: ${BOLD}terminal=$cur_term  browser=$cur_browser${NC} (from hyprland.lua)"
         echo "Installed terminals: $(command -v foot &>/dev/null && echo -n 'foot '; command -v alacritty &>/dev/null && echo -n 'alacritty '; command -v kitty &>/dev/null && echo -n 'kitty '; echo)"
         echo "Installed browsers: $(command -v zen-browser &>/dev/null && echo -n 'zen-browser '; command -v firefox &>/dev/null && echo -n 'firefox '; command -v chromium &>/dev/null && echo -n 'chromium '; echo)"
         read -rp "$(echo -e "${CYAN}Default terminal [foot/alacritty/kitty or leave empty to keep current]: ${NC}")" new_term
