@@ -35,6 +35,13 @@ hl.layer_rule({
     ignore_alpha = 0.15,
 })
 
+-- Frosted blur for the volume/brightness OSD pill
+hl.layer_rule({
+    match = { namespace = "quickshell:osd" },
+    blur = true,
+    ignore_alpha = 0.15,
+})
+
 -- Opacity rule for your regular apps
 hl.window_rule({
     name = "opacity-apps",

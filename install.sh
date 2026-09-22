@@ -345,6 +345,7 @@ EOF
 
                 # Main shell.qml (minimal, imports hypr-lens which is cloned externally)
                 cp "$RICE_DIR/quickshell/shell.qml" "$HOME/.config/quickshell/"
+                cp "$RICE_DIR/quickshell/osd.qml" "$HOME/.config/quickshell/"
 
                 # External modules — pulled from their own repos (keeps liquidshell lean)
                 # mylauncher (fast, minimal — kept vendored)

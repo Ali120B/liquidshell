@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
+import QtCore
 
 // OSD — simple translucent bottom-center for brightness/volume, themed by matugen
 // Listens to wpctl and brightnessctl via polling, shows on change
@@ -78,12 +79,33 @@ PanelWindow {
         function hide() { osd.visibleOsd = false }
     }
 
+    // Matugen palette (regenerated on every wallpaper change, watched live)
+    FileView {
+        path: String(StandardPaths.writableLocation(StandardPaths.HomeLocation)).replace(/^file:\/\//, "") + "/.config/quickshell/matugen-colors.json"
+        watchChanges: true
+        onFileChanged: reload()
+        JsonAdapter {
+            id: theme
+            property string primary: "#95cdf7"
+            property string surface: "#101417"
+            property string surface_container: "#1c2024"
+            property string on_surface: "#e0e3e8"
+        }
+    }
+
+    function withAlpha(hex: string, a: real): color {
+        const r = parseInt(hex.slice(1, 3), 16) / 255
+        const g = parseInt(hex.slice(3, 5), 16) / 255
+        const b = parseInt(hex.slice(5, 7), 16) / 255
+        return Qt.rgba(r, g, b, a)
+    }
+
     Rectangle {
         anchors.centerIn: parent
         width: 200
         height: 34
         radius: 17
-        color: "#ffffff66"
+        color: withAlpha(theme.surface, 0.55)
         border.width: 0
 
         RowLayout {
@@ -92,7 +114,7 @@ PanelWindow {
             spacing: 8
             Text {
                 text: osd.icon
-                color: "#1e1e2e"
+                color: theme.on_surface
                 font.pixelSize: 14
                 font.family: "JetBrainsMono Nerd Font"
             }
@@ -100,17 +122,17 @@ PanelWindow {
                 Layout.fillWidth: true
                 height: 3
                 radius: 2
-                color: "#e0e0e0"
+                color: withAlpha(theme.surface_container, 0.65)
                 Rectangle {
                     width: parent.width * (osd.value / 100)
                     height: parent.height
                     radius: parent.radius
-                    color: "#1e1e2e"
+                    color: theme.primary
                 }
             }
             Text {
                 text: osd.value + "%"
-                color: "#1e1e2e"
+                color: theme.on_surface
                 font.pixelSize: 10
                 font.weight: Font.DemiBold
                 Layout.preferredWidth: 28

@@ -20,7 +20,7 @@ hl.monitor({
 -- in the same Lua state, same as $vars used to be shared via `source` in hyprlang.
 
 mainMod    = "SUPER"
-terminal   = "foot"
+terminal   = "alacritty"
 menu       = "quickshell ipc -p $HOME/.config/quickshell/mylauncher call mylauncher toggle"
 fileManager = "kitty --class spf -e spf"
 browser    = "zen-browser"
