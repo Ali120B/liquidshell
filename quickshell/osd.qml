@@ -17,9 +17,9 @@ PanelWindow {
     color: "transparent"
     anchors { bottom: true; left: true; right: true }
     margins { bottom: 40 }
-    implicitWidth: 260
-    implicitHeight: 48
-    // Center the OSD horizontally — small bottom-center
+    implicitWidth: 200
+    implicitHeight: 36
+    // Small pill — bottom-center
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "quickshell:osd"
@@ -80,41 +80,40 @@ PanelWindow {
 
     Rectangle {
         anchors.centerIn: parent
-        width: parent.width - 16
-        height: 42
-        radius: 14
-        color: "#1e1e2eCC"
-        border.color: "#ffffff0F"
-        border.width: 1
+        width: 200
+        height: 34
+        radius: 17
+        color: "#ffffffCC"
+        border.width: 0
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
+            anchors.margins: 8
+            spacing: 8
             Text {
                 text: osd.icon
-                color: "#cdd6f4"
-                font.pixelSize: 16
+                color: "#1e1e2e"
+                font.pixelSize: 14
                 font.family: "JetBrainsMono Nerd Font"
             }
             Rectangle {
                 Layout.fillWidth: true
-                height: 4
+                height: 3
                 radius: 2
-                color: "#313244"
+                color: "#e0e0e0"
                 Rectangle {
                     width: parent.width * (osd.value / 100)
                     height: parent.height
                     radius: parent.radius
-                    color: "#cdd6f4"
+                    color: "#1e1e2e"
                 }
             }
             Text {
                 text: osd.value + "%"
-                color: "#cdd6f4"
-                font.pixelSize: 11
-                font.weight: Font.Medium
-                Layout.preferredWidth: 32
+                color: "#1e1e2e"
+                font.pixelSize: 10
+                font.weight: Font.DemiBold
+                Layout.preferredWidth: 28
                 horizontalAlignment: Text.AlignRight
             }
         }
