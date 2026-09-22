@@ -27,7 +27,7 @@ if [[ -f "$HOME/.config/hypr/scheme/current.lua" && -n "${HYPRLAND_INSTANCE_SIGN
   primary=$(grep -oP 'primary = "\K[0-9a-fA-F]+' "$HOME/.config/hypr/scheme/current.lua" 2>/dev/null | head -n 1)
   onsv=$(grep -oP 'onSurfaceVariant = "\K[0-9a-fA-F]+' "$HOME/.config/hypr/scheme/current.lua" 2>/dev/null | head -n 1)
   if [[ -n "$primary" && -n "$onsv" ]]; then
-    hyprctl eval "hl.config({ general = { col = { active_border = \"rgba(${primary}e6)\", inactive_border = \"rgba(${onsv}11)\" } } })" >/dev/null 2>&1 || true
+    hyprctl eval "hl.config({ general = { col = { active_border = \"rgba(${primary}99)\", inactive_border = \"rgba(${onsv}11)\" } } })" >/dev/null 2>&1 || true
   fi
 fi
 pkill -SIGUSR1 -x kitty 2>/dev/null || true
