@@ -42,7 +42,7 @@ PanelWindow {
         hideTimer.restart()
     }
     // Volume icon follows level + mute state
-    property string volIcon: osd.muted ? "\uf6a9" : osd.value <= 0 ? "\uf026" : osd.value <= 33 ? "\uf027" : "\uf028"
+    property string volIcon: osd.muted ? "\uf026" : osd.value <= 0 ? "\uf026" : osd.value <= 33 ? "\uf027" : "\uf028"
 
     // Poll for external changes (lightweight, 500ms when visible)
     Timer {
