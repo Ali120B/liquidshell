@@ -12,6 +12,7 @@ PanelWindow {
     property int value: 0 // 0-100
     property string icon: ""
     property string label: "Volume"
+    property bool muted: false
     property bool visibleOsd: false
     property int hideDelay: 1500
     visible: visibleOsd
@@ -32,13 +33,16 @@ PanelWindow {
         interval: osd.hideDelay
         onTriggered: osd.visibleOsd = false
     }
-    function show(v, ic, lb) {
+    function show(v, ic, lb, m) {
         osd.value = v
         osd.icon = ic
         osd.label = lb
+        osd.muted = !!m
         osd.visibleOsd = true
         hideTimer.restart()
     }
+    // Volume icon follows level + mute state
+    property string volIcon: osd.muted ? "" : osd.value <= 0 ? "" : osd.value <= 33 ? "" : osd.value <= 66 ? "" : ""
 
     // Poll for external changes (lightweight, 500ms when visible)
     Timer {
@@ -50,12 +54,17 @@ PanelWindow {
 
     Process {
         id: volProc
-        command: ["bash", "-c", "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | grep -oP '\\d+\\.\\d+' | awk '{print int($1*100)}'"]
+        command: ["bash", "-c", "out=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null); echo \"$out\" | grep -oP '\\d+\\.\\d+' | awk '{print int($1*100)}'; echo \"$out\" | grep -q MUTED && echo 1 || echo 0"]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {
-                let v = parseInt(this.text.trim())
-                if (!isNaN(v) && Math.abs(v - osd.value) > 2 && osd.label === "Volume") osd.value = v
+                const lines = this.text.trim().split("\n")
+                const v = parseInt(lines[0])
+                const m = lines.length > 1 && lines[1].trim() === "1"
+                if (osd.label === "Volume") {
+                    if (!isNaN(v) && Math.abs(v - osd.value) > 2) osd.value = v
+                    osd.muted = m
+                }
             }
         }
     }
@@ -74,8 +83,8 @@ PanelWindow {
     // IPC for manual trigger from keybinds/scripts
     IpcHandler {
         target: "osd"
-        function showVolume(v: int) { osd.show(v, "", "Volume") }
-        function showBrightness(v: int) { osd.show(v, "", "Brightness") }
+        function showVolume(v: int, m: int) { osd.show(v, "", "Volume", m === 1) }
+        function showBrightness(v: int) { osd.show(v, "", "Brightness", false) }
         function hide() { osd.visibleOsd = false }
     }
 
@@ -90,6 +99,7 @@ PanelWindow {
             property string surface: "#101417"
             property string surface_container: "#1c2024"
             property string on_surface: "#e0e3e8"
+            property string outline: "#8b9198"
         }
     }
 
@@ -113,8 +123,8 @@ PanelWindow {
             anchors.margins: 8
             spacing: 8
             Text {
-                text: osd.icon
-                color: theme.on_surface
+                text: osd.label === "Volume" ? osd.volIcon : osd.icon
+                color: osd.muted ? theme.outline : theme.on_surface
                 font.pixelSize: 14
                 font.family: "JetBrainsMono Nerd Font"
             }
@@ -127,12 +137,12 @@ PanelWindow {
                     width: parent.width * (osd.value / 100)
                     height: parent.height
                     radius: parent.radius
-                    color: theme.primary
+                    color: osd.muted ? theme.outline : theme.primary
                 }
             }
             Text {
-                text: osd.value + "%"
-                color: theme.on_surface
+                text: (osd.label === "Volume" && osd.muted) ? "muted" : osd.value + "%"
+                color: osd.muted ? theme.outline : theme.on_surface
                 font.pixelSize: 10
                 font.weight: Font.DemiBold
                 Layout.preferredWidth: 28
