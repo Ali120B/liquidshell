@@ -3,17 +3,42 @@
 set -euo pipefail
 WALL="$1"
 [[ -f "$WALL" ]] || exit 0
+# Videos/gifs: NEVER feed the whole file to matugen/magick — they decode every
+# frame into RAM (up to ~10GB). Snapshot one small frame and theme from that.
+SRC="$WALL"
+case "$WALL" in
+  *.mp4|*.MP4|*.webm|*.WEBM|*.mkv|*.MKV|*.mov|*.MOV|*.gif|*.GIF)
+    SNAP="$(mktemp /tmp/matugen-frame-XXXXXX.jpg)"
+    trap 'rm -f "$SNAP"' EXIT
+    if command -v ffmpeg >/dev/null 2>&1 \
+      && ffmpeg -y -loglevel error -i "$WALL" -vframes 1 -vf "scale=320:-1" "$SNAP" 2>/dev/null \
+      && [[ -s "$SNAP" ]]; then
+      SRC="$SNAP"
+    else
+      SRC="" # snapshot failed -> neutral fallback below
+    fi
+    ;;
+esac
 # NOTE: --prefer saturation picks the wallpaper's dominant hue (e.g. green stays
 # green). --prefer darkness biased toward dark tones and washed hues out to blue.
 # BUT near-monochrome wallpapers (e.g. pure black, sat ~0) have no hue to keep,
 # so saturation preference grabs a random vivid color (usually blue). Detect
 # that case and theme from neutral gray instead.
-SAT=$(magick "$WALL" -colorspace HSL -channel S -separate +channel -format "%[fx:mean]" info: 2>/dev/null || echo 1)
+if [[ -z "$SRC" ]]; then
+  matugen color hex "#8b9198" -m dark -t scheme-monochrome >/dev/null 2>&1 || true
+  SRC="$WALL" # reloads below still run; theming already done, skip re-theme
+  SKIP_THEME=1
+else
+  SKIP_THEME=0
+fi
+if [[ "$SKIP_THEME" -eq 0 ]]; then
+SAT=$(magick "$SRC" -colorspace HSL -channel S -separate +channel -format "%[fx:mean]" info: 2>/dev/null || echo 1)
 if awk "BEGIN {exit !(($SAT + 0) < 0.08)}"; then
   # Monochrome: tonal-spot from gray still invents blue, monochrome stays neutral.
   matugen color hex "#8b9198" -m dark -t scheme-monochrome >/dev/null 2>&1 || true
 else
-  matugen image "$WALL" --prefer saturation -m dark >/dev/null 2>&1 || matugen image "$WALL" --prefer saturation >/dev/null 2>&1 || true
+  matugen image "$SRC" --prefer saturation -m dark >/dev/null 2>&1 || matugen image "$SRC" --prefer saturation >/dev/null 2>&1 || true
+fi
 fi
 # Hyprland: strip # (scheme expects without #)
 if [[ -f "$HOME/.config/hypr/scheme/current.lua" ]]; then
