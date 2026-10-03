@@ -122,15 +122,15 @@ hl.config({
 require("animations.dusky")
 
 -- Liquidshell deltas vs upstream preset (later declarations win, so the
--- vendored files stay verbatim and the layer rule survives preset swaps):
--- 1. No layer animations: quickshell surfaces (launcher, wallpaper picker,
---    OSD, cheatsheet) are layer-shell windows — show them instantly.
-hl.animation({ leaf = "layers", enabled = false })
-hl.animation({ leaf = "layersIn", enabled = false })
-hl.animation({ leaf = "layersOut", enabled = false })
-hl.animation({ leaf = "fadeLayersIn", enabled = false })
-hl.animation({ leaf = "fadeLayersOut", enabled = false })
--- 2. Snappier windows: same curves/styles, shorter durations
+-- vendored files stay verbatim and these rules survive preset swaps):
+-- Quickshell layer anims: minimal short fades like before Dusky (launcher,
+-- picker, OSD, cheatsheet are layer-shell windows). No popin/slide.
+hl.animation({ leaf = "layers", enabled = true, speed = 3, bezier = "default", style = "fade" })
+hl.animation({ leaf = "layersIn", enabled = true, speed = 3, bezier = "default", style = "fade" })
+hl.animation({ leaf = "layersOut", enabled = true, speed = 3, bezier = "default", style = "fade" })
+hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 3, bezier = "default" })
+hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 3, bezier = "default" })
+-- Snappier windows: same curves/styles, shorter durations
 --    (higher speed value = slower in Hyprland).
 hl.animation({ leaf = "windowsIn", enabled = true, speed = 5, bezier = "overshot", style = "popin 80%" })
 hl.animation({ leaf = "windowsOut", enabled = true, speed = 4, bezier = "snap", style = "popin 80%" })
