@@ -12,7 +12,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 
 | Component | Description |
 |-----------|-------------|
-| **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity (Dusky showcase preset, 12 switchable presets in `hypr/animations/`) |
+| **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity (Dusky showcase preset, 12 switchable presets in `hypr/animations/`; layer anims off so quickshell pops instantly, windows sped up) |
 | **Launcher** | One-shot app launcher (`SUPER`, `mylauncher` IPC) |
 | **hypr-lens** | Region screenshot, OCR, search, recording — [Ali120B/hypr-lens](https://github.com/Ali120B/hypr-lens) (custom `record.sh` overlay) |
 | **Waybar** | Frosted glass top bar — workspaces, CPU, RAM, clock, mpris, volume, power button |

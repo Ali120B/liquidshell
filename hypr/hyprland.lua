@@ -121,6 +121,24 @@ hl.config({
 -- require("animations.disable").
 require("animations.dusky")
 
+-- Liquidshell deltas vs upstream preset (later declarations win, so the
+-- vendored files stay verbatim and the layer rule survives preset swaps):
+-- 1. No layer animations: quickshell surfaces (launcher, wallpaper picker,
+--    OSD, cheatsheet) are layer-shell windows — show them instantly.
+hl.animation({ leaf = "layers", enabled = false })
+hl.animation({ leaf = "layersIn", enabled = false })
+hl.animation({ leaf = "layersOut", enabled = false })
+hl.animation({ leaf = "fadeLayersIn", enabled = false })
+hl.animation({ leaf = "fadeLayersOut", enabled = false })
+-- 2. Snappier windows: same curves/styles, shorter durations
+--    (higher speed value = slower in Hyprland).
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 5, bezier = "overshot", style = "popin 80%" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 4, bezier = "snap", style = "popin 80%" })
+hl.animation({ leaf = "windowsMove", enabled = true, speed = 5, bezier = "overshot", style = "slide" })
+hl.animation({ leaf = "fade", enabled = true, speed = 4, bezier = "fluid" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 6, bezier = "overshot", style = "slide" })
+hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 6, bezier = "overshot", style = "slidevert" })
+
 -- LAYOUT
 hl.config({
     dwindle = { preserve_split = true },
