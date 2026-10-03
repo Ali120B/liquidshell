@@ -13,13 +13,14 @@ RICE_DIR="$HOME/liquidshell"
 # helper: clone or pull
 clone_or_pull(){
   local repo="$1" dest="$2"
+  # NOTE: hard timeout — a stalled GitHub connection hung updates forever.
   if [[ -d "$dest/.git" ]]; then
     info "Pulling $dest"
-    git -C "$dest" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Pull failed for $dest (will re-clone on next install)"
+    timeout 60 git -C "$dest" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Pull failed/timed out for $dest (will re-clone on next install)"
   else
     info "Cloning $repo -> $dest"
     rm -rf "$dest"
-    git clone --depth 1 "$repo" "$dest" 2>&1 | sed 's/^/  /' || warn "Clone failed for $repo"
+    timeout 120 git clone --depth 1 "$repo" "$dest" 2>&1 | sed 's/^/  /' || warn "Clone failed/timed out for $repo"
   fi
 }
 
@@ -34,7 +35,7 @@ do_update(){
   # 1. Pull main rice
   if [[ -d "$RICE_DIR/.git" ]]; then
     info "Updating liquidshell..."
-    git -C "$RICE_DIR" pull --ff-only 2>&1 | sed 's/^/  /' || warn "liquidshell pull failed"
+    timeout 60 git -C "$RICE_DIR" pull --ff-only 2>&1 | sed 's/^/  /' || warn "liquidshell pull failed/timed out"
   else
     warn "No $RICE_DIR git repo found"
   fi
@@ -50,7 +51,7 @@ do_update(){
   # 3. Pull other apps (if present)
   if [[ -d "$HOME/Sung/.git" ]]; then
     info "Updating Sung..."
-    git -C "$HOME/Sung" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Sung pull failed"
+    timeout 60 git -C "$HOME/Sung" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Sung pull failed/timed out"
     # rebuild if needed? user can run ./scripts/install.sh manually
   fi
   # 4. Update system packages for rice deps (optional, not forced)
@@ -86,7 +87,6 @@ do_status(){
       echo " $(basename "$d"): not cloned"
     fi
   done
-  systemctl --user is-active skwd-walld 2>&1 | sed 's/^/ skwd-walld: /'
   pgrep -a quickshell 2>&1 | sed 's/^/ quickshell: /' | head -n 10
 }
 

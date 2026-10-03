@@ -56,13 +56,15 @@ install_packages() {
 # ── Clone or pull a git repo (idempotent) ───────────────────────────────────
 clone_or_pull() {
     local repo="$1" dest="$2"
+    # NOTE: git gets a hard timeout — a stalled GitHub connection used to hang
+    # the whole installer forever with zero output.
     if [[ -d "$dest/.git" ]]; then
         info "Updating $dest from $repo ..."
-        git -C "$dest" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Pull failed for $dest"
+        timeout 60 git -C "$dest" pull --ff-only 2>&1 | sed 's/^/  /' || warn "Pull failed/timed out for $dest"
     else
         info "Cloning $repo -> $dest ..."
         rm -rf "$dest"
-        git clone --depth 1 "$repo" "$dest" 2>&1 | sed 's/^/  /' || warn "Clone failed for $repo"
+        timeout 120 git clone --depth 1 "$repo" "$dest" 2>&1 | sed 's/^/  /' || warn "Clone failed/timed out for $repo"
     fi
 }
 
@@ -479,8 +481,9 @@ post_install() {
         ok "liquidshell command installed to ~/.local/bin/liquidshell (run: liquidshell update)"
     fi
 
-    # Default apps chooser (browser + terminal) — keep it minimal
-    if [[ -f "$HOME/.config/hypr/hyprland.lua" ]]; then
+    # Default apps chooser (browser + terminal) — keep it minimal.
+    # Skipped entirely in NONINTERACTIVE mode (liquidshell update).
+    if [[ "${NONINTERACTIVE:-0}" != "1" && -f "$HOME/.config/hypr/hyprland.lua" ]]; then
         header "Default Apps"
         cur_term=$(grep -oP '^terminal\s*=\s*"\K[^"]+' "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || echo "foot")
         cur_browser=$(grep -oP '^browser\s*=\s*"\K[^"]+' "$HOME/.config/hypr/hyprland.lua" 2>/dev/null || echo "zen-browser")
@@ -501,7 +504,10 @@ post_install() {
         fi
     fi
 
-    # Wallpaper locations — ask after defaults
+    # Wallpaper locations — ask after defaults (skip when NONINTERACTIVE)
+    if [[ "${NONINTERACTIVE:-0}" == "1" ]]; then
+        info "Skipping wallpaper location prompts (non-interactive update)"
+    else
     header "Wallpaper Locations"
     local cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
     local cur_live=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || echo "$HOME/Pictures/Livewall")
@@ -522,6 +528,7 @@ post_install() {
         jq --arg p "$new_live" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl.json 2>/dev/null && mv /tmp/hqpl.json "$HOME/.config/quickshell/hyprquickpaper-live/config.json" || true
         jq --arg p "$new_live" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl2.json 2>/dev/null && mv /tmp/hqpl2.json "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || true
         ok "Live wallpaper dir set to $new_live"
+    fi
     fi
 }
 
@@ -567,6 +574,8 @@ main() {
     if [[ "${1:-}" == "--update-mode" ]]; then
         detect_distro
         SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
+        # Non-interactive: never sit on a read prompt during updates.
+        export NONINTERACTIVE=1
         deploy_configs
         post_install
         return 0
