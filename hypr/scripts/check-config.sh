@@ -40,6 +40,18 @@ check_lua_dir() {
     else
         pass "$label: no duplicate binds"
     fi
+    # Window animation presets (hypr/animations/*.lua, Dusky-vendored)
+    if [[ -d "$dir/animations" ]]; then
+        local af
+        for af in "$dir"/animations/*.lua; do
+            [[ -e "$af" ]] || continue
+            if luac -p "$af" 2>/tmp/check-config-lua-err; then
+                pass "$label: animations/$(basename "$af")"
+            else
+                fail "$label: animations/$(basename "$af"): $(cat /tmp/check-config-lua-err)"
+            fi
+        done
+    fi
 }
 
 check_bash_dir() {

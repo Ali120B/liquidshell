@@ -114,15 +114,12 @@ hl.config({
     },
 })
 
--- Old: bezier = easeOut,0.05,0.9,0.1,1.0
-hl.curve("easeOut", { type = "bezier", points = { {0.05, 0.9}, {0.1, 1.0} } })
-
--- Old: animation = windows,1,5,easeOut  (enabled, speed, style)
-hl.animation({ leaf = "windows",    enabled = true, speed = 5, bezier = "easeOut" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 5, bezier = "easeOut" })
-hl.animation({ leaf = "border",     enabled = true, speed = 5, bezier = "default" })
-hl.animation({ leaf = "fade",       enabled = true, speed = 4, bezier = "default" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "default" })
+-- Window animations: Dusky showcase preset (floating <-> tiling, open/close,
+-- move, layers, workspaces). Vendored from dusklinux/dusky into
+-- hypr/animations/. Switch by changing the require below, e.g.
+-- require("animations.minimal"), require("animations.fast"),
+-- require("animations.disable").
+require("animations.dusky")
 
 -- LAYOUT
 hl.config({

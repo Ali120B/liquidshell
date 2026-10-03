@@ -314,6 +314,9 @@ deploy_configs() {
                 cp "$RICE_DIR/hypr/hypridle.conf"   "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/scripts/"*.sh      "$HOME/.config/hypr/scripts/"
                 cp "$RICE_DIR/hypr/scripts/"*.txt      "$HOME/.config/hypr/scripts/" 2>/dev/null || true
+                # Window animation presets (Dusky showcase default, switch via require in hyprland.lua)
+                mkdir -p "$HOME/.config/hypr/animations"
+                cp "$RICE_DIR/hypr/animations/"*.lua   "$HOME/.config/hypr/animations/"
                 # Never redeploy retired scripts (e.g. awww/mpvpaper wallpaper helpers)
                 rm -f "$HOME/.config/hypr/scripts/"*.retired
                 chmod +x "$HOME/.config/hypr/scripts/"*.sh
