@@ -48,7 +48,7 @@ Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 | `SUPER + Q` | Close Window |
 | `SUPER + F` | Fullscreen |
 | `SUPER + Space` | Toggle Floating |
-| `SUPER + H/J/K/L` | Focus (vim-style) |
+| `SUPER + H/J/K` | Focus (vim-style, arrows for right — L is lock) |
 | `SUPER + SHIFT + H/J/K/L` | Move Window |
 | `SUPER + CTRL + H/J/K/L` | Resize Window |
 | `SUPER + 1-0` | Switch Workspace |
@@ -65,7 +65,7 @@ Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 | `SUPER + CTRL + W` | Toggle Waybar |
 | `SUPER + N` | Notification History |
 | `SUPER + O` | Opacity Menu |
-| `SUPER + Tab` | Lock Screen (pauses video wallpaper) |
+| `SUPER + L / Tab` | Lock Screen (pauses video wallpaper) |
 | `SUPER + Escape` | Logout Menu |
 | `SUPER + SHIFT + E` | Exit Hyprland |
 | `F1` | Cheatsheet |
@@ -159,7 +159,7 @@ login, recolors Hyprland borders live (`hyprctl eval`, no reload) and
 regenerates `~/.config/waybar/colors.css` (matugen palette) on every
 wallpaper change, then reloads waybar. Run
 `hypr/scripts/wallpaper-theme.sh --current` to re-theme on demand.
-Locking (`SUPER+Tab`, idle lock) pauses video wallpapers and resumes on
+Locking (`SUPER+L` / `SUPER+Tab`, idle lock) pauses video wallpapers and resumes on
 unlock via `hypr/scripts/lock.sh`.
 
 ### Config validation
@@ -226,6 +226,7 @@ Edit `hypr/hyprland.lua` to change:
 - [Quickshell](https://quickshell.outfoxxed.me)
 - [hypr-lens](https://github.com/Ali120B/hypr-lens)
 - [skwd-wall](https://github.com/liixini/skwd-wall)
+- [Dusky](https://github.com/dusklinux/dusky) — hyprlock 001_dusky theme + matugen hyprlock-colors template (adapted paths only)
 - [Nerd Fonts](https://www.nerdfonts.com)
 
 ---

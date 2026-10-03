@@ -13,7 +13,10 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofi -show emoji -theme-str 'message { enabled: false; }'"))
 
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
+-- Lock screen: SUPER+L (primary) + SUPER+Tab (legacy). lock.sh snapshots
+-- the active wallpaper to ~/.cache/current_wallpaper for the Dusky 001 theme.
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/notifications.sh"))
@@ -54,11 +57,11 @@ hl.bind("F1", hl.dsp.exec_cmd("quickshell -n --path " .. home .. "/.config/quick
 -- from the CLI) - log out via loginctl instead, same as wlogout does.
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("loginctl terminate-session $XDG_SESSION_ID"))
 
--- Focus (H/J/K/L = left/down/up/right, vim-style, matching your original)
+-- Focus (H/J/K = left/down/up, vim-style). NOTE: SUPER+L is lock screen
+-- (see above), so focus-right is arrows only to avoid a duplicate bind.
 hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "right" }))
 
 -- Focus with arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))

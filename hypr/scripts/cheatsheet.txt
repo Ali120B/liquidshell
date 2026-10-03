@@ -12,7 +12,7 @@
 <span foreground="#7AA2F7">SUPER + drag</span>      Move / Resize (LMB/RMB)
 
 <span foreground="#7AA2F7" weight="bold" size="large">Focus / Move</span>
-<span foreground="#7AA2F7">SUPER + arrows</span>    Focus window                <span foreground="#7AA2F7">SUPER + H J K L</span>  Focus (vim)
+<span foreground="#7AA2F7">SUPER + arrows</span>    Focus window                <span foreground="#7AA2F7">SUPER + H J K</span>  Focus (vim, L = lock)
 <span foreground="#7AA2F7">SUPER + SHIFT + arrows</span>  Move / rearrange tile  <span foreground="#7AA2F7">SUPER + CTRL + arrows</span>  Resize
 
 <span foreground="#7AA2F7" weight="bold" size="large">Workspaces</span>
@@ -26,7 +26,7 @@
 <span foreground="#7AA2F7">Print</span>              Screenshot to clipboard
 
 <span foreground="#7AA2F7" weight="bold" size="large">System</span>
-<span foreground="#7AA2F7">SUPER + Tab</span>       Lock Screen                <span foreground="#7AA2F7">SUPER + Esc</span>       Logout Menu
+<span foreground="#7AA2F7">SUPER + L / Tab</span>  Lock Screen                <span foreground="#7AA2F7">SUPER + Esc</span>       Logout Menu
 <span foreground="#7AA2F7">SUPER + SHIFT + E</span>  Exit Hyprland              <span foreground="#7AA2F7">SUPER + Z</span>        Keyboard Layout
 <span foreground="#7AA2F7">XF86 Audio keys</span>    Volume / Media             <span foreground="#7AA2F7">XF86 Brightness</span>   Screen Brightness
 
