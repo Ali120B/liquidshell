@@ -45,6 +45,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("bash $HOME/.config/hypr/scripts/restore-wallpaper.sh")
     hl.exec_cmd("bash $HOME/.config/hypr/scripts/live-wallpaper-autopause.sh")
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-theme.sh --watch")
 end)
 
 -------------------------------

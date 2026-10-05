@@ -18,8 +18,8 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/lock.sh"))
 
--- Power profile: cycle power-saver/balanced/performance + OSD
--- (also on scroll over the waybar power button)
+-- Power profile: step up power-saver/balanced/performance + OSD
+-- (also on right-click over the waybar power button)
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/power-profile.sh next"))
 hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper"))

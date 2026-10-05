@@ -34,5 +34,5 @@
 <span foreground="#7AA2F7">SUPER + W</span>         Wallpaper Picker           <span foreground="#7AA2F7">SUPER + V</span>        Clipboard (clipse)
 <span foreground="#7AA2F7">SUPER + N</span>         Notification History       <span foreground="#7AA2F7">SUPER + SHIFT + N</span>  Test Notification
 <span foreground="#7AA2F7">SUPER + SHIFT + W</span>  Live Wallpaper Picker     <span foreground="#7AA2F7">SUPER + CTRL + W</span>  Toggle Waybar
-<span foreground="#7AA2F7">SUPER + P</span>         Power Profile (cycle)        <span foreground="#7AA2F7">scroll on ⏻</span>       Power Profile
+<span foreground="#7AA2F7">SUPER + P</span>         Power Profile (cycle)        <span foreground="#7AA2F7">right-click ⏻</span>     Power Profile
 <span foreground="#7AA2F7">F1</span>               This Cheatsheet
