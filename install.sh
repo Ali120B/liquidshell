@@ -91,6 +91,7 @@ declare -A COMPONENTS=(
     [fish]="Fish shell (config.fish, functions; starship prompt via matugen)"
     [foot]="Foot terminal (font/padding/cursor; 16-color palette via matugen)"
     [fastfetch]="Fastfetch system info box (all-white icons, matugen logo colors)"
+    [zsh]="Zsh shell (zshrc: starship, autosuggestions, git aliases)"
 )
 
 SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot fastfetch)
@@ -302,6 +303,12 @@ deploy_configs() {
             fish)        backup_config "fish" ;;
             foot)        backup_config "foot" ;;
             fastfetch)   backup_config "fastfetch" ;;
+            zsh)
+                if [[ -f "$HOME/.zshrc" ]]; then
+                    mkdir -p "$BACKUP_DIR"
+                    cp "$HOME/.zshrc" "$BACKUP_DIR/.zshrc"
+                    info "Backed up: ~/.zshrc -> $BACKUP_DIR/.zshrc"
+                fi ;;
         esac
     done
 
@@ -471,6 +478,11 @@ EOF
                 mkdir -p "$HOME/.config/fastfetch"
                 cp "$RICE_DIR/fastfetch/config.jsonc" "$HOME/.config/fastfetch/"
                 ok "Fastfetch config installed (icons stay white, logo via matugen)"
+                ;;
+            zsh)
+                info "Installing Zsh config..."
+                cp "$RICE_DIR/zsh/zshrc" "$HOME/.zshrc"
+                ok "Zsh config installed (set login shell: chsh -s /usr/bin/zsh)"
                 ;;
         esac
     done

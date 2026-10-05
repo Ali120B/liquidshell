@@ -1,0 +1,53 @@
+# liquidshell zshrc — mirrors the fish setup (shared by liquidshell + liquidshellmangowm).
+# Starship prompt (matugen), zoxide, direnv, eza, git aliases, autosuggestions.
+
+# --- history ---
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt share_history extended_history hist_ignore_dups hist_ignore_space hist_reduce_blanks
+
+# --- completion (case-insensitive, menu select) ---
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+if [[ -o interactive ]]; then
+  # starship prompt (matugen-themed via ~/.config/starship.toml)
+  command -v starship >/dev/null && eval "$(starship init zsh)"
+
+  # direnv + zoxide (zoxide replaces cd)
+  command -v direnv >/dev/null && eval "$(direnv hook zsh)"
+  command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
+
+  # better ls
+  command -v eza >/dev/null && alias ls='eza --icons --group-directories-first -1'
+
+  # plugins (silent when missing)
+  [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+  [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  if [[ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]]; then
+    source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+  fi
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
+  # git aliases (mirror fish abbrs)
+  alias lg='lazygit' gd='git diff' ga='git add .' gc='git commit -am' gl='git log'
+  alias gs='git status' gst='git stash' gsp='git stash pop' gp='git push' gpl='git pull'
+  alias gsw='git switch' gsm='git switch main' gb='git branch' gbd='git branch -d'
+  alias gco='git checkout' gsh='git show'
+
+  alias l='ls' ll='ls -l' la='ls -a' lla='ls -la'
+
+  # greeting: fastfetch box (no ASCII art)
+  command -v fastfetch >/dev/null && fastfetch --key-padding-left 5
+
+  # foot prompt-jump marks (same as fish mark_prompt_start)
+  precmd() { print -Pn "\e]133;A\e\\" }
+fi
+
+# local bins (rice CLIs live here)
+export PATH="$HOME/.local/bin:$PATH"

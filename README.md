@@ -24,6 +24,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 | **Dunst** | Notification daemon (Tokyo Night style) |
 | **Kitty** | Terminal with Material 3 theme |
 | **Fish + Starship** | Interactive shell (abbrs, zoxide, eza) + matugen prompt (power profile, battery) |
+| **Zsh** | Alt interactive shell (same aliases, autosuggestions, history search, starship) |
 
 ---
 
