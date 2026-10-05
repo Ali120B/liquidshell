@@ -20,7 +20,7 @@ hl.monitor({
 -- in the same Lua state, same as $vars used to be shared via `source` in hyprlang.
 
 mainMod    = "SUPER"
-terminal   = "alacritty"
+terminal   = "footclient" -- foot server (see autostart) keeps memory shared/low
 menu       = "quickshell ipc -p $HOME/.config/quickshell/mylauncher call mylauncher toggle"
 fileManager = "kitty --class spf -e spf"
 browser    = "zen-browser"
@@ -38,6 +38,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("blueman-applet")
     hl.exec_cmd("clipse -listen")
+    hl.exec_cmd("foot --server") -- shared glyph cache, low memory per window
     hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 
     hl.exec_cmd("quickshell -n -d")
