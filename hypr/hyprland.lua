@@ -100,6 +100,8 @@ hl.config({
         rounding = 12,
         active_opacity = 1.0,
         inactive_opacity = 1.0,
+        dim_inactive = true, -- darken inactive instead of transparency (cheap + visible)
+        dim_strength = 0.15,
         blur = {
             enabled = false, -- off by default (perf); toggle anytime via SUPER+O > Off
             size = 8,
