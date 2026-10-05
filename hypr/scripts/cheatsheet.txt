@@ -8,7 +8,7 @@
 
 <span foreground="#7AA2F7" weight="bold" size="large">Windows</span>
 <span foreground="#7AA2F7">SUPER + Q</span>         Close Window                <span foreground="#7AA2F7">SUPER + F</span>        Fullscreen
-<span foreground="#7AA2F7">SUPER + Space</span>     Toggle Floating             <span foreground="#7AA2F7">SUPER + O</span>        Opacity Menu
+<span foreground="#7AA2F7">SUPER + Space</span>     Toggle Floating             <span foreground="#7AA2F7">SUPER + O</span>        Opacity / Blur Menu
 <span foreground="#7AA2F7">SUPER + drag</span>      Move / Resize (LMB/RMB)
 
 <span foreground="#7AA2F7" weight="bold" size="large">Focus / Move</span>

@@ -66,7 +66,7 @@ Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 | `SUPER + SHIFT + C` | Color Picker |
 | `SUPER + CTRL + W` | Toggle Waybar |
 | `SUPER + N` | Notification History |
-| `SUPER + O` | Opacity Menu |
+| `SUPER + O` | Opacity Menu (+ blur on/off toggle) |
 | `SUPER + P` / right-click on `⏻` | Step power profile up (saver/balanced/performance + OSD) |
 | `SUPER + L / Tab` | Lock Screen (pauses video wallpaper) |
 | `SUPER + Escape` | Logout Menu |

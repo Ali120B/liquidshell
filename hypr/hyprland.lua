@@ -99,15 +99,15 @@ hl.config({
     decoration = {
         rounding = 12,
         active_opacity = 1.0,
-        inactive_opacity = 0.75,
+        inactive_opacity = 1.0,
         blur = {
-            enabled = true,
+            enabled = false, -- off by default (perf); toggle anytime via SUPER+O > Off
             size = 8,
             passes = 2,
             vibrancy = 0.2,
         },
         shadow = {
-            enabled = true,
+            enabled = false, -- off by default (perf)
             range = 12,
             render_power = 3,
         },
