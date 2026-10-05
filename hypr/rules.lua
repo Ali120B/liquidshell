@@ -11,7 +11,7 @@
 -- four times would leave you with only one (broken, effect-less) rule.
 -- Below, each rule gets a unique name and the missing `float = true` is added.
 
-local window_opacity = 0.85
+local window_opacity = 0.9
 local window_inactive_opacity = 1.0 -- opaque inactive (perf); dim_inactive in hyprland.lua keeps them distinct
 
 -- Layer rules (old: layerrule = blur on / ignore_alpha 0.15, match:namespace rofi)
