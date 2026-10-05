@@ -89,9 +89,11 @@ declare -A COMPONENTS=(
     [dunst]="Dunst notification daemon (dunstrc)"
     [kitty]="Kitty terminal (config + theme)"
     [fish]="Fish shell (config.fish, functions; starship prompt via matugen)"
+    [foot]="Foot terminal (font/padding/cursor; 16-color palette via matugen)"
+    [fastfetch]="Fastfetch system info box (all-white icons, matugen logo colors)"
 )
 
-SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot)
+SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot fastfetch)
 
 print_banner() {
     clear
@@ -111,7 +113,7 @@ component_menu() {
     print_banner
     echo -e "${BOLD}This will install:${NC}\n"
 
-    local keys=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot)
+    local keys=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot fastfetch)
     for key in "${keys[@]}"; do
         echo -e "  ${GREEN}[✓]${NC} ${BOLD}$key${NC}  — ${COMPONENTS[$key]}"
     done
@@ -299,6 +301,7 @@ deploy_configs() {
             kitty)       backup_config "kitty" ;;
             fish)        backup_config "fish" ;;
             foot)        backup_config "foot" ;;
+            fastfetch)   backup_config "fastfetch" ;;
         esac
     done
 
@@ -463,6 +466,12 @@ EOF
                 fi
                 ok "Foot config installed (16-color palette comes from matugen)"
                 ;;
+            fastfetch)
+                info "Installing Fastfetch config..."
+                mkdir -p "$HOME/.config/fastfetch"
+                cp "$RICE_DIR/fastfetch/config.jsonc" "$HOME/.config/fastfetch/"
+                ok "Fastfetch config installed (icons stay white, logo via matugen)"
+                ;;
         esac
     done
 
@@ -601,7 +610,7 @@ print_summary() {
 main() {
     if [[ "${1:-}" == "--update-mode" ]]; then
         detect_distro
-        SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot)
+        SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot fastfetch)
         # Non-interactive: never sit on a read prompt during updates.
         export NONINTERACTIVE=1
         deploy_configs
