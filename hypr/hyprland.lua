@@ -89,8 +89,8 @@ hl.config({
         gaps_out = 5,
         border_size = 2,
         col = {
-            active_border = "rgba(ffffff30)",
-            inactive_border = "rgba(ffffff10)",
+            active_border = "rgba(ffffff40)",
+            inactive_border = "rgba(ffffff1e)",
         },
         resize_on_border = true,
         allow_tearing = false,
@@ -101,7 +101,7 @@ hl.config({
         active_opacity = 1.0,
         inactive_opacity = 1.0,
         dim_inactive = true, -- darken inactive instead of transparency (cheap + visible)
-        dim_strength = 0.15,
+        dim_strength = 0.3,
         blur = {
             enabled = false, -- off by default (perf); toggle anytime via SUPER+O > Off
             size = 8,
