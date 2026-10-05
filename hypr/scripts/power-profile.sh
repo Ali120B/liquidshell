@@ -24,4 +24,6 @@ esac
 if [[ "${1:-next}" != "show" ]]; then
     powerprofilesctl set "${PROFILES[$idx]}" 2>/dev/null || true
 fi
+# Cache for the starship prompt (instant read, no D-Bus wait per render).
+powerprofilesctl get 2>/dev/null > ~/.cache/power-profile || true
 quickshell ipc -p ~/.config/quickshell call osd showPowerProfile "${PROFILES[$idx]}" 2>/dev/null || true

@@ -23,7 +23,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 | **Clipse** | Clipboard manager with custom pink/blue theme |
 | **Dunst** | Notification daemon (Tokyo Night style) |
 | **Kitty** | Terminal with Material 3 theme |
-| **Fish + Starship** | Interactive shell (abbrs, zoxide, eza) + matugen prompt |
+| **Fish + Starship** | Interactive shell (abbrs, zoxide, eza) + matugen prompt (power profile, battery) |
 
 ---
 
