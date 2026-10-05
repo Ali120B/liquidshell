@@ -23,6 +23,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 | **Clipse** | Clipboard manager with custom pink/blue theme |
 | **Dunst** | Notification daemon (Tokyo Night style) |
 | **Kitty** | Terminal with Material 3 theme |
+| **Fish + Starship** | Interactive shell (abbrs, zoxide, eza) + matugen prompt |
 
 ---
 
@@ -65,6 +66,7 @@ Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 | `SUPER + CTRL + W` | Toggle Waybar |
 | `SUPER + N` | Notification History |
 | `SUPER + O` | Opacity Menu |
+| `SUPER + P` / scroll on `⏻` | Cycle power profile (saver/balanced/performance + OSD) |
 | `SUPER + L / Tab` | Lock Screen (pauses video wallpaper) |
 | `SUPER + Escape` | Logout Menu |
 | `SUPER + SHIFT + E` | Exit Hyprland |

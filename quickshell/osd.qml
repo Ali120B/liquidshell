@@ -14,6 +14,7 @@ PanelWindow {
     property string label: "Volume"
     property bool muted: false
     property bool visibleOsd: false
+    property string displayText: "" // when set, right side shows text instead of %
     property int hideDelay: 1500
     visible: visibleOsd
     color: "transparent"
@@ -38,6 +39,7 @@ PanelWindow {
         osd.icon = ic
         osd.label = lb
         osd.muted = !!m
+        osd.displayText = ""
         osd.visibleOsd = true
         hideTimer.restart()
     }
@@ -85,6 +87,12 @@ PanelWindow {
         target: "osd"
         function showVolume(v: int, m: int) { osd.show(v, "", "Volume", m === 1) }
         function showBrightness(v: int) { osd.show(v, "", "Brightness", false) }
+        function showPowerProfile(p: string) {
+            if (p === "power-saver") osd.show(25, "", "Power", false)
+            else if (p === "performance") osd.show(100, "", "Power", false)
+            else osd.show(55, "", "Power", false)
+            osd.displayText = p === "power-saver" ? "Power saver" : (p === "performance" ? "Performance" : "Balanced")
+        }
         function hide() { osd.visibleOsd = false }
     }
 
@@ -141,11 +149,11 @@ PanelWindow {
                 }
             }
             Text {
-                text: (osd.label === "Volume" && osd.muted) ? "muted" : osd.value + "%"
+                text: osd.displayText !== "" ? osd.displayText : ((osd.label === "Volume" && osd.muted) ? "muted" : osd.value + "%")
                 color: osd.muted ? theme.outline : theme.on_surface
                 font.pixelSize: 10
                 font.weight: Font.DemiBold
-                Layout.preferredWidth: 28
+                Layout.preferredWidth: osd.displayText !== "" ? 78 : 28
                 horizontalAlignment: Text.AlignRight
             }
         }

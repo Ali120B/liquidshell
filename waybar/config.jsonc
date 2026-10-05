@@ -70,6 +70,8 @@
     "custom/power": {
         "format": "⏻",
         "tooltip": false,
-        "on-click": "wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325"
+        "on-click": "wlogout -b 1 -c 20 -r 20 -L 1700 -R 1700 -T 325 -B 325",
+        "on-scroll-up": "$HOME/.config/hypr/scripts/power-profile.sh up",
+        "on-scroll-down": "$HOME/.config/hypr/scripts/power-profile.sh down"
     }
 }

@@ -34,6 +34,10 @@ output_path = "~/.config/quickshell/matugen-colors.json"
 input_path = "templates/clipse.json"
 output_path = "~/.config/clipse/custom_theme.json"
 
+[templates.starship]
+input_path = "templates/starship.toml"
+output_path = "~/.config/starship.toml"
+
 [templates.hyprlock]
 input_path = "templates/hyprlock-colors.conf"
 output_path = "~/.config/matugen/generated/hyprlock-colors.conf"

@@ -36,6 +36,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("waybar")
     hl.exec_cmd("pkill -9 mako; dunst")
     hl.exec_cmd("nm-applet")
+    hl.exec_cmd("blueman-applet")
     hl.exec_cmd("clipse -listen")
     hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 

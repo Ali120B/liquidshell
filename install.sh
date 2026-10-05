@@ -88,9 +88,10 @@ declare -A COMPONENTS=(
     [clipse]="Clipse clipboard manager (config, theme)"
     [dunst]="Dunst notification daemon (dunstrc)"
     [kitty]="Kitty terminal (config + theme)"
+    [fish]="Fish shell (config.fish, functions; starship prompt via matugen)"
 )
 
-SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
+SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish)
 
 print_banner() {
     clear
@@ -110,7 +111,7 @@ component_menu() {
     print_banner
     echo -e "${BOLD}This will install:${NC}\n"
 
-    local keys=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
+    local keys=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish)
     for key in "${keys[@]}"; do
         echo -e "  ${GREEN}[✓]${NC} ${BOLD}$key${NC}  — ${COMPONENTS[$key]}"
     done
@@ -296,6 +297,7 @@ deploy_configs() {
             clipse)      backup_config "clipse" ;;
             dunst)       backup_config "dunst" ;;
             kitty)       backup_config "kitty" ;;
+            fish)        backup_config "fish" ;;
         esac
     done
 
@@ -438,6 +440,13 @@ EOF
                     cp "$RICE_DIR/kitty/current-theme.conf" "$HOME/.config/kitty/"
                 ok "Kitty config installed"
                 ;;
+            fish)
+                info "Installing Fish config..."
+                mkdir -p "$HOME/.config/fish/functions"
+                cp "$RICE_DIR/fish/config.fish" "$HOME/.config/fish/"
+                cp "$RICE_DIR/fish/functions/"*.fish "$HOME/.config/fish/functions/" 2>/dev/null || true
+                ok "Fish config installed (starship prompt comes from matugen)"
+                ;;
         esac
     done
 
@@ -576,7 +585,7 @@ print_summary() {
 main() {
     if [[ "${1:-}" == "--update-mode" ]]; then
         detect_distro
-        SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty)
+        SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish)
         # Non-interactive: never sit on a read prompt during updates.
         export NONINTERACTIVE=1
         deploy_configs
