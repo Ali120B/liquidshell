@@ -7,8 +7,15 @@ HISTSIZE=50000
 SAVEHIST=50000
 setopt share_history extended_history hist_ignore_dups hist_ignore_space hist_reduce_blanks
 
-# --- completion (case-insensitive, menu select) ---
-autoload -Uz compinit && compinit
+# --- completion (cached dump: full scan at most once a day, instant after) ---
+autoload -Uz compinit
+_zcompdump=~/.zcompdump
+if [[ -f "$_zcompdump" ]] && find "$_zcompdump" -mtime -1 -print 2>/dev/null | grep -q .; then
+  compinit -C -d "$_zcompdump"
+else
+  compinit -d "$_zcompdump"
+fi
+unset _zcompdump
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
@@ -42,8 +49,15 @@ if [[ -o interactive ]]; then
 
   alias l='ls' ll='ls -l' la='ls -a' lla='ls -la'
 
-  # greeting: fastfetch box (no ASCII art)
-  command -v fastfetch >/dev/null && fastfetch --key-padding-left 5
+  # greeting: fastfetch box (no ASCII art); timeout-guarded so a stuck
+  # probe can never block shell startup
+  if command -v fastfetch >/dev/null; then
+    if command -v timeout >/dev/null; then
+      timeout 3 fastfetch --key-padding-left 5
+    else
+      fastfetch --key-padding-left 5
+    fi
+  fi
 
   # foot prompt-jump marks (same as fish mark_prompt_start)
   precmd() { print -Pn "\e]133;A\e\\" }
