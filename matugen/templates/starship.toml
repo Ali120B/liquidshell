@@ -3,7 +3,7 @@ palette = "matugen"
 add_newline = true
 continuation_prompt = "[▸▹ ](matugen_outline)"
 
-format = """$username$hostname$directory$git_branch$git_status$nodejs$python$rust$golang${custom.power_saver}${custom.power_balanced}${custom.power_performance}$fill$cmd_duration$line_break$jobs$character"""
+format = """$username$hostname$directory$git_branch$git_status$nodejs$python$rust$golang$fill$cmd_duration$line_break$jobs$character"""
 
 right_format = """$battery$time"""
 
@@ -79,30 +79,6 @@ format = "took [$duration]($style) "
 symbol = " "
 style = "matugen_secondary"
 format = "[$symbol$number]($style) "
-
-# Power profile: one module per state, only the active one renders.
-# State comes from ~/.cache/power-profile (written by power-profile.sh),
-# so the prompt never waits on D-Bus.
-[custom.power_saver]
-description = "Power profile indicator (power-saver)"
-command = "printf 'Saver'"
-when = "test \"$(cat ~/.cache/power-profile 2>/dev/null)\" = power-saver"
-format = "[\\U0000F06C $output]($style) "
-style = "matugen_tertiary"
-
-[custom.power_balanced]
-description = "Power profile indicator (balanced)"
-command = "printf 'Balanced'"
-when = "test \"$(cat ~/.cache/power-profile 2>/dev/null)\" = balanced"
-format = "[\\U0000F24E $output]($style) "
-style = "matugen_secondary"
-
-[custom.power_performance]
-description = "Power profile indicator (performance)"
-command = "printf 'Performance'"
-when = "test \"$(cat ~/.cache/power-profile 2>/dev/null)\" = performance"
-format = "[\\U0000F0E7 $output]($style) "
-style = "matugen_primary"
 
 [battery]
 full_symbol = "\\U0000F240 "
