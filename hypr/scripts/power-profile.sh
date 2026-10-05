@@ -13,9 +13,11 @@ for i in "${!PROFILES[@]}"; do
 done
 [[ $idx -eq -1 ]] && idx=1 # unknown current -> treat as balanced
 
-# Clamped, no wrap: up/next stop at performance, down/prev at power-saver.
+# Single-button control (right-click/SUPER+P) must always move: up/next
+# wraps performance -> power-saver so it cycles through all three.
+# down/prev clamp at power-saver (nothing below it).
 case "${1:-next}" in
-    up|next)   [[ $idx -lt 2 ]] && idx=$((idx + 1)) ;;
+    up|next)   idx=$(( (idx + 1) % 3 )) ;;
     down|prev) [[ $idx -gt 0 ]] && idx=$((idx - 1)) ;;
     show) ;;
     *) echo "usage: power-profile.sh [up|down|next|show]" >&2; exit 1 ;;
