@@ -48,8 +48,9 @@ hl.bind("SUPER + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind(mainMod .. " + R", hl.dsp.global("quickshell:regionRecord"))
 hl.bind("SUPER + SHIFT + R", hl.dsp.global("quickshell:regionRecordWithSound"))
 
--- Clipboard (clipse in floating transparent terminal)
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -o window.padding.x=12 -o window.padding.y=12 -o background_opacity=0.7 -e clipse"))
+-- Clipboard (clipse in floating small terminal; foot respects Hyprland
+-- size rules, kitty floating windows ignore them and fill the screen)
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("footclient --app-id clipse -w 380x580 -e clipse"))
 
 -- Keyboard layout
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("hyprctl switchxkblayout current next"))

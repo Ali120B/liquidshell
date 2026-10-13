@@ -52,11 +52,16 @@ hl.window_rule({
 })
 
 -- Float rules (fixed: unique names + float = true actually set)
+-- clipse: small centered box. size is a Vec2 table {w, h} (the old hyprlang
+-- "420 520" string still parses, but keep the Lua-native form). Launched via
+-- footclient --app-id clipse -w 380x580 (keybinds.lua): foot honors both the
+-- rule and its own -w size, while kitty floating windows ignore size rules
+-- and fill the screen.
 hl.window_rule({
     name = "clipse-float",
     match = { class = "^clipse$" },
     float = true,
-    size = "420 520",
+    size = { 380, 580 },
     center = true,
     opacity = "0.92 override 0.92 override 1.0 override",
 })
