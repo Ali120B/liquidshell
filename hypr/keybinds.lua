@@ -104,6 +104,10 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + ALT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
+-- Switch workspaces with SUPER + mouse wheel / touchpad scroll
+hl.bind(mainMod .. " + mouse_down", hl.dsp.exec_cmd("hyprctl dispatch workspace e+1"))
+hl.bind(mainMod .. " + mouse_up", hl.dsp.exec_cmd("hyprctl dispatch workspace e-1"))
+
 -- Mouse move/resize (confirmed pattern from the official example config)
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
