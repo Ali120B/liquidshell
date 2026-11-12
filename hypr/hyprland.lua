@@ -7,7 +7,7 @@
 ------------------
 hl.monitor({
     output   = "",
-    mode     = "1920x1080@120",
+    mode     = "preferred", -- panel only supports 60/48 Hz; don't force 120
     position = "auto",
     scale    = 1.0,
 })
@@ -20,9 +20,9 @@ hl.monitor({
 -- in the same Lua state, same as $vars used to be shared via `source` in hyprlang.
 
 mainMod    = "SUPER"
-terminal   = "footclient" -- foot server (see autostart) keeps memory shared/low
+terminal   = "footclient -o 'font=Tiny5 Mono CRT:size=14, JetBrainsMono Nerd Font:size=14'" -- CRT font now; foot.ini applies after server restart
 menu       = "quickshell ipc -p $HOME/.config/quickshell/mylauncher call mylauncher toggle"
-fileManager = "kitty --class spf -e spf"
+fileManager = "nautilus"
 browser    = "zen-browser"
 
 -------------------
@@ -39,6 +39,9 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("blueman-applet")
     hl.exec_cmd("clipse -listen")
     hl.exec_cmd("foot --server") -- shared glyph cache, low memory per window
+    -- Warm starship/direnv/fastfetch into page cache so the first fish
+    -- prompt doesn't read them cold from the HDD.
+    hl.exec_cmd("sh $HOME/.config/hypr/scripts/preload-terminal-cache.sh")
     hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 
     hl.exec_cmd("quickshell -n -d")
@@ -69,7 +72,7 @@ hl.env("TERMINAL", "foot")
 
 hl.config({
     input = {
-        kb_layout = "us",
+        kb_layout = "us,ara",
         follow_mouse = 1,
         sensitivity = 0.5,
         touchpad = {

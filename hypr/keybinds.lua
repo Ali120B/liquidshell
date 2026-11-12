@@ -52,8 +52,13 @@ hl.bind("SUPER + SHIFT + R", hl.dsp.global("quickshell:regionRecordWithSound"))
 -- size rules, kitty floating windows ignore them and fill the screen)
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("footclient --app-id clipse -w 380x580 -e clipse"))
 
--- Keyboard layout
+-- Keyboard layout EN <-> AR via fcitx5 (Hyprland XKB switching loses to
+-- fcitx's IM state, so fcitx owns both layouts). Needs keyboard-us +
+-- keyboard-ara in the fcitx5 Default group. The switcher notifies our
+-- pill over IPC (the compositor layout event doesn't fire for fcitx
+-- switches), and fcitx's own switch box is silenced in its config.
 hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("hyprctl switchxkblayout current next"))
+hl.bind("CTRL + SHIFT + Space", hl.dsp.exec_cmd("sh -c 'if [ \"$(fcitx5-remote -n)\" = keyboard-us ]; then N=keyboard-ara; S=AR; else N=keyboard-us; S=EN; fi; fcitx5-remote -s \"$N\"; quickshell ipc -p ~/projects/macospills/hyprland call capspill flashLayout \"$S\"'"))
 
 -- Cheatsheet (quickshell)
 hl.bind("F1", hl.dsp.exec_cmd("quickshell -n --path " .. home .. "/.config/quickshell/hyprcheatsheet"))
@@ -124,3 +129,5 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 -- Brightness
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("bash " .. home .. "/.config/hypr/scripts/brightness.sh up"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("bash " .. home .. "/.config/hypr/scripts/brightness.sh down"), { locked = true, repeating = true })
+
+
