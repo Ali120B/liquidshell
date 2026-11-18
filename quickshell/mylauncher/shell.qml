@@ -181,7 +181,7 @@ ShellRoot {
 
     Rectangle {
       anchors.fill: parent
-      radius: 14
+      radius: 24
       color: "#A8141414"
       border.width: 1
       border.color: "#14FFFFFF"
@@ -194,7 +194,7 @@ ShellRoot {
         Rectangle {
           Layout.fillWidth: true
           Layout.preferredHeight: 40
-          radius: 12
+          radius: 20
           color: "#14FFFFFF"
           border.width: 1
           border.color: "#1FFFFFFF"
@@ -257,7 +257,7 @@ ShellRoot {
           highlightFollowsCurrentItem: true
           // Tight tracking: no trailing glide after key release.
           highlightMoveDuration: 120
-          highlight: Rectangle { radius: 8; color: "#2AFFFFFF" }
+          highlight: Rectangle { radius: 14; color: "#2AFFFFFF" }
 
           delegate: Item {
             required property var modelData
@@ -270,7 +270,7 @@ ShellRoot {
             // so a parked cursor can't fight arrow-key nav.
             Rectangle {
               anchors.fill: parent
-              radius: 8
+              radius: 14
               color: "#14FFFFFF"
               visible: rowMouse.containsMouse && !isCurrent
             }

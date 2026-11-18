@@ -12,28 +12,20 @@ window#waybar {
     margin-bottom: 2px;
 }
 
-/* LEFT */
+/* Section containers only position the capsules */
 .modules-left {
-    background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 8px;
-    margin: 3px 0 3px 6px;
+    margin: 0 0 0 6px;
 }
 
-/* CENTER */
 .modules-center {
-    background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 8px;
-    margin: 3px 0;
+    margin: 0;
 }
 
-/* RIGHT */
 .modules-right {
-    background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 8px;
-    margin: 3px 6px 3px 0;
+    margin: 0 6px 0 0;
 }
 
-/* Module spacing */
+/* Every module is its own pill/capsule */
 #workspaces,
 #cpu,
 #memory,
@@ -42,22 +34,22 @@ window#waybar {
 #mpris,
 #custom-pacman,
 #custom-power {
-    padding: 0 10px;
-    margin: 0 2px;
+    background-color: rgba(20, 20, 20, 0.2);
+    border-radius: 999px;
+    padding: 0 12px;
+    margin: 3px 2px;
 }
 
-/* Workspaces */
+/* Workspaces: a capsule of capsule buttons */
 #workspaces {
-    background-color: transparent;
-    padding: 0 6px;
-    margin: 0;
+    padding: 0 5px;
 }
 
 #workspaces button {
     color: rgba(255, 255, 255, 0.45);
     background-color: transparent;
-    border-radius: 6px;
-    padding: 0 8px;
+    border-radius: 999px;
+    padding: 0 9px;
     margin: 3px 2px;
     border: none;
     transition: all 0.15s ease;
@@ -86,7 +78,7 @@ window#waybar {
 #custom-power {
     color: #ffffff;
     font-size: 15px;
-    margin-right: 10px;
+    margin-right: 6px;
 }
 
 /* Pacman updates — 3600s interval, 0% idle */
@@ -116,7 +108,7 @@ tooltip {
     background-color: rgba(20, 20, 20, 0.4);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border-radius: 16px;
 }
 
 tooltip label {
@@ -124,8 +116,7 @@ tooltip label {
     font-size: 14px;
 }
 
-/* Interactive hover effect */
-#workspaces,
+/* Capsule hover: brighten the pill, keep its shape/height stable */
 #cpu,
 #memory,
 #clock,
@@ -133,7 +124,7 @@ tooltip label {
 #mpris,
 #custom-pacman,
 #custom-power {
-    transition: font-size 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 
 #cpu:hover,
@@ -143,5 +134,5 @@ tooltip label {
 #mpris:hover,
 #custom-pacman:hover,
 #custom-power:hover {
-    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.08);
 }

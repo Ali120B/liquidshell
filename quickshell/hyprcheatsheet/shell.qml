@@ -141,7 +141,7 @@ ShellRoot {
 
             Rectangle {
                 anchors.fill: parent
-                radius: 24
+                radius: 30
                 color: "#8C151820"
                 border.width: 1
                 border.color: "#18FFFFFF"
@@ -192,7 +192,7 @@ ShellRoot {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 44
-                    radius: 14
+                    radius: 22
                     color: "#18FFFFFF"
                     border.width: 1
                     border.color: searchInput.activeFocus ? "#407AA2F7" : "#12FFFFFF"
@@ -249,7 +249,7 @@ ShellRoot {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    radius: 18
+                    radius: 24
                     color: "#12FFFFFF"
                     clip: true
 
@@ -277,7 +277,7 @@ ShellRoot {
                         }
 
                         highlight: Rectangle {
-                            radius: 10
+                            radius: 14
                             color: "#22FFFFFF"
                         }
                         highlightFollowsCurrentItem: true
@@ -292,7 +292,7 @@ ShellRoot {
                                 anchors.rightMargin: 10
                                 spacing: 12
                                 Rectangle {
-                                    radius: 6
+                                    radius: 9
                                     color: "#10FFFFFF"
                                     border.width: 1
                                     border.color: "#14FFFFFF"

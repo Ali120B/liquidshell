@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Io
+import Quickshell.Widgets
 import QtQuick
 import Qt.labs.folderlistmodel
 import Quickshell.Wayland
@@ -176,42 +177,48 @@ PanelWindow {
                     transform: Shear { xFactor: main.skewFactor }
                 }
 
-                Image {
-                    id: img
+                ClippingRectangle {
                     anchors.fill: parent
-                    opacity: 0.8
-                    fillMode: Image.PreserveAspectCrop
+                    radius: 16
+                    color: "transparent"
 
-                    asynchronous: true
-                    cache: false
-                    smooth: true
+                    Image {
+                        id: img
+                        anchors.fill: parent
+                        opacity: 0.8
+                        fillMode: Image.PreserveAspectCrop
 
-                    source: "file://" + configs.cache_path + fileName
+                        asynchronous: true
+                        cache: false
+                        smooth: true
 
-                    // Decode once at the largest size this image will ever be shown at
-                    // (the active/zoomed size), rather than tracking the animating
-                    // width/height - that would re-decode on every animation frame
-                    // and cause a visible blink.
-                    sourceSize.width: delegateItem.baseWidth * main.zoomScale
-                    sourceSize.height: delegateItem.height
+                        source: "file://" + configs.cache_path + fileName
 
-                    transform: Shear { xFactor: main.skewFactor }
+                        // Decode once at the largest size this image will ever be shown at
+                        // (the active/zoomed size), rather than tracking the animating
+                        // width/height - that would re-decode on every animation frame
+                        // and cause a visible blink.
+                        sourceSize.width: delegateItem.baseWidth * main.zoomScale
+                        sourceSize.height: delegateItem.height
 
-                    Timer {
-                        id: retryTimer
-                        interval: 1000
-                        repeat: false
-                        onTriggered: {
-                            const s = img.source
-                            img.source = ""
-                            img.source = s
+                        transform: Shear { xFactor: main.skewFactor }
+
+                        Timer {
+                            id: retryTimer
+                            interval: 1000
+                            repeat: false
+                            onTriggered: {
+                                const s = img.source
+                                img.source = ""
+                                img.source = s
+                            }
                         }
-                    }
 
-                    onStatusChanged: {
-                        if (status === Image.Error) {
-                            alt.text = "Caching"
-                            retryTimer.start()
+                        onStatusChanged: {
+                            if (status === Image.Error) {
+                                alt.text = "Caching"
+                                retryTimer.start()
+                            }
                         }
                     }
                 }
@@ -222,6 +229,7 @@ PanelWindow {
                     anchors.fill: parent
                     visible: delegateItem.active
                     color: "transparent"
+                    radius: 16
 
                     border.width: 2
                     border.color: configs.border_color
