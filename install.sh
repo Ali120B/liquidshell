@@ -18,6 +18,10 @@ header()  { echo -e "\n${BOLD}${CYAN}── $* ──${NC}"; }
 RICE_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/.config/ali2-rice-backup/$(date +%Y%m%d_%H%M%S)"
 
+# Wallpaper picker choice ("skwd" or "legacy"), persisted across updates.
+WALLPAPER_PICKER_STATE="$HOME/.config/hypr/.wallpaper-picker"
+WALLPAPER_PICKER="${WALLPAPER_PICKER:-}"
+
 # ── Detect distro ───────────────────────────────────────────────────────────
 detect_distro() {
     if [ -f /etc/os-release ]; then
@@ -188,6 +192,99 @@ install_quickshell_deps() {
     fi
 }
 
+# ── Wallpaper picker: Skwd Wall v2 vs legacy Quickshell ─────────────────────
+install_skwd_wall() {
+    header "Skwd Wall v2"
+
+    if command -v skwd-wall-v2 &>/dev/null && command -v skwd-lens &>/dev/null; then
+        ok "Skwd Wall v2 is already installed"
+        return 0
+    fi
+
+    case "$DISTRO_ID" in
+        arch|cachyos|manjaro|endeavouros|garuda)
+            local helper=""
+            if command -v yay &>/dev/null; then
+                helper="yay"
+            elif command -v paru &>/dev/null; then
+                helper="paru"
+            fi
+            if [[ -n "$helper" ]]; then
+                info "Installing Skwd Wall from AUR ($helper)..."
+                "$helper" -S --needed --noconfirm skwd-wall-v2-bin skwd-lens-bin || \
+                    warn "Skwd Wall install failed. Retry: $helper -S skwd-wall-v2-bin skwd-lens-bin"
+            else
+                warn "No AUR helper found (yay/paru). Install manually:"
+                warn "  yay -S skwd-wall-v2-bin skwd-lens-bin"
+            fi
+            ;;
+        *)
+            warn "Skwd Wall packages are AUR-only. Install manually: skwd-wall-v2-bin skwd-lens-bin"
+            ;;
+    esac
+}
+
+choose_wallpaper_picker() {
+    local current="skwd"
+    if [[ -f "$WALLPAPER_PICKER_STATE" ]]; then
+        current="$(<"$WALLPAPER_PICKER_STATE")"
+    elif [[ -f "$HOME/.config/hypr/keybinds.lua" ]] && \
+         ! grep -q '^hl\.bind.*skwd-wall-v2' "$HOME/.config/hypr/keybinds.lua"; then
+        current="legacy"
+    fi
+    [[ "$current" == "legacy" ]] || current="skwd"
+
+    if [[ "${NONINTERACTIVE:-0}" == "1" ]]; then
+        WALLPAPER_PICKER="$current"
+    else
+        header "Wallpaper Picker"
+        echo -e "  1) ${BOLD}Skwd Wall v2${NC}  — picker + mixer (images / video / Wallpaper Engine)"
+        echo -e "  2) ${BOLD}Legacy${NC}        — Quickshell hyprquickpaper (static + live)"
+        local default=1
+        [[ "$current" == "legacy" ]] && default=2
+        local pick=""
+        read -rp "$(echo -e "${CYAN}Choose wallpaper picker [1/2] (default ${default}): ${NC}")" pick
+        pick="${pick:-$default}"
+        case "$pick" in
+            2|legacy|Legacy) WALLPAPER_PICKER="legacy" ;;
+            *)               WALLPAPER_PICKER="skwd" ;;
+        esac
+    fi
+
+    mkdir -p "$(dirname "$WALLPAPER_PICKER_STATE")"
+    echo "$WALLPAPER_PICKER" > "$WALLPAPER_PICKER_STATE"
+
+    if [[ "$WALLPAPER_PICKER" == "skwd" ]]; then
+        install_skwd_wall
+    else
+        info "Using legacy Quickshell wallpaper picker"
+    fi
+}
+
+apply_wallpaper_picker() {
+    local keybinds="${1:-$HOME/.config/hypr/keybinds.lua}"
+    [[ -f "$keybinds" ]] || return 0
+    local choice="${WALLPAPER_PICKER:-skwd}"
+
+    local skwd_line='hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("skwd-wall-v2"))'
+    local legacy_static_line='hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper"))'
+    local legacy_live_line='hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("quickshell --path " .. home .. "/.config/quickshell/hyprquickpaper-live"))'
+
+    # Normalize every wallpaper bind to commented, then enable the chosen set.
+    sed -i "s|^${skwd_line}|-- ${skwd_line}|" "$keybinds"
+    sed -i "s|^${legacy_static_line}|-- ${legacy_static_line}|" "$keybinds"
+    sed -i "s|^${legacy_live_line}|-- ${legacy_live_line}|" "$keybinds"
+
+    if [[ "$choice" == "legacy" ]]; then
+        sed -i "s|^-- ${legacy_static_line}|${legacy_static_line}|" "$keybinds"
+        sed -i "s|^-- ${legacy_live_line}|${legacy_live_line}|" "$keybinds"
+        ok "Wallpaper picker: legacy Quickshell (SUPER+W / SUPER+SHIFT+W)"
+    else
+        sed -i "s|^-- ${skwd_line}|${skwd_line}|" "$keybinds"
+        ok "Wallpaper picker: Skwd Wall v2 (SUPER+W)"
+    fi
+}
+
 # ── Sung music player ─────────────────────────────────────────────────────────
 install_sung() {
     header "Sung Music Player"
@@ -322,6 +419,7 @@ deploy_configs() {
                 cp "$RICE_DIR/hypr/hyprland.lua"   "$HOME/.config/hypr/"
                 ln -sf hyprland.lua "$HOME/.config/hypr/hyprland.conf"  # single source, no drift
                 cp "$RICE_DIR/hypr/keybinds.lua"   "$HOME/.config/hypr/"
+                apply_wallpaper_picker "$HOME/.config/hypr/keybinds.lua"
                 cp "$RICE_DIR/hypr/rules.lua"       "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/hyprlock.conf"   "$HOME/.config/hypr/"
                 cp "$RICE_DIR/hypr/hypridle.conf"   "$HOME/.config/hypr/"
@@ -504,20 +602,22 @@ EOF
 post_install() {
     header "Post-Install Setup"
 
-    # Wallpaper dirs for hyprquickpaper (static + live)
+    # Wallpaper dirs (Skwd Wall library + legacy Quickshell pickers)
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
         mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall"
-        cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
-        # Expand __HOME__ if needed
-        cur_wall_expanded=$(echo "$cur_wall" | sed "s|__HOME__|$HOME|g")
-        if [[ -z "$(ls -A "$cur_wall_expanded" 2>/dev/null)" ]]; then
-            info "No wallpapers found in $cur_wall_expanded"
-            echo "  Add images there, or set a custom path in hyprquickpaper config.json"
-            cur_live_expanded=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null | sed "s|__HOME__|$HOME|g" || echo "$HOME/Pictures/Livewall")
-            echo "  Live videos in $cur_live_expanded work too (SUPER+SHIFT+W)"
+        if [[ "${WALLPAPER_PICKER:-skwd}" == "legacy" ]]; then
+            cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
+            # Expand __HOME__ if needed
+            cur_wall_expanded=$(echo "$cur_wall" | sed "s|__HOME__|$HOME|g")
+            if [[ -z "$(ls -A "$cur_wall_expanded" 2>/dev/null)" ]]; then
+                info "No wallpapers found in $cur_wall_expanded"
+                echo "  Add images there, or set a custom path in hyprquickpaper config.json"
+                cur_live_expanded=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null | sed "s|__HOME__|$HOME|g" || echo "$HOME/Pictures/Livewall")
+                echo "  Live videos in $cur_live_expanded work too (SUPER+SHIFT+W)"
+            fi
+            # hyprquickpaper thumbnail caches
+            mkdir -p "$HOME/.cache/quickshell/thumbs" "$HOME/.cache/quickshell/thumbs-live" 2>/dev/null || true
         fi
-        # hyprquickpaper thumbnail caches
-        mkdir -p "$HOME/.cache/quickshell/thumbs" "$HOME/.cache/quickshell/thumbs-live" 2>/dev/null || true
     fi
 
     # hyprland.conf is always a symlink to hyprland.lua (single source, no drift)
@@ -553,31 +653,33 @@ post_install() {
         fi
     fi
 
-    # Wallpaper locations — ask after defaults (skip when NONINTERACTIVE)
-    if [[ "${NONINTERACTIVE:-0}" == "1" ]]; then
-        info "Skipping wallpaper location prompts (non-interactive update)"
-    else
-    header "Wallpaper Locations"
-    local cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
-    local cur_live=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || echo "$HOME/Pictures/Livewall")
-    echo -e "Current static: ${BOLD}$cur_wall${NC}"
-    echo -e "Current live:   ${BOLD}$cur_live${NC}"
-    read -rp "$(echo -e "${CYAN}Static wallpaper dir (leave empty to keep): ${NC}")" new_wall
-    if [[ -n "$new_wall" ]]; then
-        new_wall=$(eval echo "$new_wall")
-        mkdir -p "$new_wall" 2>/dev/null || true
-        jq --arg p "$new_wall" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper/config.json" > /tmp/hqp.json 2>/dev/null && mv /tmp/hqp.json "$HOME/.config/quickshell/hyprquickpaper/config.json" || true
-        jq --arg p "$new_wall" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper/config.json" > /tmp/hqp2.json 2>/dev/null && mv /tmp/hqp2.json "$RICE_DIR/quickshell/hyprquickpaper/config.json" 2>/dev/null || true
-        ok "Static wallpaper dir set to $new_wall"
-    fi
-    read -rp "$(echo -e "${CYAN}Live wallpaper dir (leave empty to keep): ${NC}")" new_live
-    if [[ -n "$new_live" ]]; then
-        new_live=$(eval echo "$new_live")
-        mkdir -p "$new_live" 2>/dev/null || true
-        jq --arg p "$new_live" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl.json 2>/dev/null && mv /tmp/hqpl.json "$HOME/.config/quickshell/hyprquickpaper-live/config.json" || true
-        jq --arg p "$new_live" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl2.json 2>/dev/null && mv /tmp/hqpl2.json "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || true
-        ok "Live wallpaper dir set to $new_live"
-    fi
+    # Wallpaper locations — legacy picker only (skip when NONINTERACTIVE)
+    if [[ "${WALLPAPER_PICKER:-skwd}" == "legacy" ]]; then
+        if [[ "${NONINTERACTIVE:-0}" == "1" ]]; then
+            info "Skipping wallpaper location prompts (non-interactive update)"
+        else
+            header "Wallpaper Locations"
+            local cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
+            local cur_live=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || echo "$HOME/Pictures/Livewall")
+            echo -e "Current static: ${BOLD}$cur_wall${NC}"
+            echo -e "Current live:   ${BOLD}$cur_live${NC}"
+            read -rp "$(echo -e "${CYAN}Static wallpaper dir (leave empty to keep): ${NC}")" new_wall
+            if [[ -n "$new_wall" ]]; then
+                new_wall=$(eval echo "$new_wall")
+                mkdir -p "$new_wall" 2>/dev/null || true
+                jq --arg p "$new_wall" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper/config.json" > /tmp/hqp.json 2>/dev/null && mv /tmp/hqp.json "$HOME/.config/quickshell/hyprquickpaper/config.json" || true
+                jq --arg p "$new_wall" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper/config.json" > /tmp/hqp2.json 2>/dev/null && mv /tmp/hqp2.json "$RICE_DIR/quickshell/hyprquickpaper/config.json" 2>/dev/null || true
+                ok "Static wallpaper dir set to $new_wall"
+            fi
+            read -rp "$(echo -e "${CYAN}Live wallpaper dir (leave empty to keep): ${NC}")" new_live
+            if [[ -n "$new_live" ]]; then
+                new_live=$(eval echo "$new_live")
+                mkdir -p "$new_live" 2>/dev/null || true
+                jq --arg p "$new_live" '.wallpaper_path = $p' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl.json 2>/dev/null && mv /tmp/hqpl.json "$HOME/.config/quickshell/hyprquickpaper-live/config.json" || true
+                jq --arg p "$new_live" '.wallpaper_path = $p' "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" > /tmp/hqpl2.json 2>/dev/null && mv /tmp/hqpl2.json "$RICE_DIR/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || true
+                ok "Live wallpaper dir set to $new_live"
+            fi
+        fi
     fi
 }
 
@@ -602,16 +704,26 @@ print_summary() {
     echo "  3. Use SUPER+T for terminal, SUPER+. for app launcher"
     echo "  4. Run 'hyprctl reload' to apply config changes"
     echo ""
-    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W wallpapers · SUPER+SHIFT+W live wallpapers · F1 cheatsheet"
+    echo -e "${BOLD}Keybinds:${NC}  SUPER launcher · SUPER+W wallpapers · F1 cheatsheet"
     echo ""
-    echo -e "${BOLD}Wallpaper (hyprquickpaper):${NC}"
-    echo "  SUPER+W        static (images in ~/Pictures/Wallpapers)"
-    echo "  SUPER+SHIFT+W  live video (videos in ~/Pictures/Livewall)"
+    if [[ "${WALLPAPER_PICKER:-skwd}" == "legacy" ]]; then
+        echo -e "${BOLD}Wallpaper (legacy hyprquickpaper):${NC}"
+        echo "  SUPER+W        static (images in ~/Pictures/Wallpapers)"
+        echo "  SUPER+SHIFT+W  live video (videos in ~/Pictures/Livewall)"
+    else
+        echo -e "${BOLD}Wallpaper (Skwd Wall v2):${NC}"
+        echo "  SUPER+W        picker / mixer (skwd-wall-v2)"
+    fi
     echo ""
 
 
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
-        echo -e "${YELLOW}Note:${NC} quickshell, skwd-wall and Sung are installed automatically (AUR / source build):"
+        if [[ "${WALLPAPER_PICKER:-skwd}" == "skwd" ]]; then
+            echo -e "${YELLOW}Note:${NC} quickshell, Skwd Wall and Sung are installed automatically (AUR / source build):"
+            echo "  Skwd Wall:  yay -S skwd-wall-v2-bin skwd-lens-bin"
+        else
+            echo -e "${YELLOW}Note:${NC} quickshell and Sung are installed automatically (source build):"
+        fi
         echo "  quickshell: https://quickshell.outfoxxed.me"
         echo "  Sung:       built from https://github.com/yappologistic/Sung into ~/.local/bin/sung"
         echo ""
@@ -625,6 +737,7 @@ main() {
         SELECTED=(hyprland waybar quickshell rofi wlogout clipse dunst kitty fish foot fastfetch)
         # Non-interactive: never sit on a read prompt during updates.
         export NONINTERACTIVE=1
+        choose_wallpaper_picker
         deploy_configs
         post_install
         return 0
@@ -637,6 +750,7 @@ main() {
 
     detect_distro
     component_menu
+    choose_wallpaper_picker
     install_core_deps
 
     # Only ask for quickshell deps if quickshell was selected

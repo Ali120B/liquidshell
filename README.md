@@ -55,8 +55,7 @@ Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 | `SUPER + CTRL + H/J/K/L` | Resize Window |
 | `SUPER + 1-0` | Switch Workspace |
 | `SUPER + ALT + 1-0` | Move Window to Workspace |
-| `SUPER + W` | Wallpaper picker (skwd-wall) |
-| `SUPER + SHIFT + W` | Wallpaper mixer (skwd-wall) |
+| `SUPER + W` | Wallpaper picker (Skwd Wall v2, or legacy picker via installer) |
 | `SUPER + V` | Clipboard (Clipse) |
 | `SUPER + SHIFT + S` | Region Screenshot |
 | `SUPER + SHIFT + A` | Region Search |
@@ -94,12 +93,13 @@ cd ~/liquidshell
 The installer will:
 1. Detect your distro
 2. Let you choose which components to install
-3. Install system dependencies (hyprland, waybar, kitty, etc.)
-4. Download Nerd Fonts (JetBrainsMono, Iosevka, CascadiaCode)
-5. Back up any existing `~/.config/` configs
-6. Deploy everything to the right places
-7. Replace path placeholders with your actual `$HOME`
-8. Register `liquidshell` command to `~/.local/bin/liquidshell`
+3. Ask for a wallpaper picker: Skwd Wall v2 (AUR) or the legacy Quickshell pickers
+4. Install system dependencies (hyprland, waybar, kitty, etc.)
+5. Download Nerd Fonts (JetBrainsMono, Iosevka, CascadiaCode)
+6. Back up any existing `~/.config/` configs
+7. Deploy everything to the right places
+8. Replace path placeholders with your actual `$HOME`
+9. Register `liquidshell` command to `~/.local/bin/liquidshell`
 
 ### Update
 
@@ -147,15 +147,17 @@ Wallpapers are handled by [skwd-wall](https://github.com/liixini/skwd-wall)
 `skwd-walld`. It restores the last wallpaper on login by itself.
 
 - `SUPER+W` — picker (`skwd-wall-v2`)
-- `SUPER+SHIFT+W` — mixer, opened directly (`skwd-wall-v2 --mixer`)
 - Library default is `~/Pictures/Wallpapers` (change in Settings > Sources);
   videos in `~/Pictures/Livewall/` apply fine too, e.g.
   `skwd-helm apply ~/Pictures/Livewall/mist-over-the-pines.1920x1080.mp4`
 - Pause/resume video wallpapers: `skwd-helm pause` / `skwd-helm resume`
 
-The old `hyprquickpaper` / `hyprquickpaper-live` pickers and the
-`awww`+`mpvpaper` helpers are fully removed (recoverable from git history
-if ever needed).
+The installer also offers a **legacy** mode: it comments out the Skwd Wall
+bind and re-enables the `hyprquickpaper` (static) and `hyprquickpaper-live`
+(SUPER+SHIFT+W) Quickshell pickers. The choice is stored in
+`~/.config/hypr/.wallpaper-picker`, so `liquidshell update` keeps it. The old
+`awww`+`mpvpaper` helpers are fully removed (recoverable from git history if
+ever needed).
 
 Wallpaper-driven theming: `hypr/scripts/wallpaper-theme.sh --watch` runs at
 login, recolors Hyprland borders live (`hyprctl eval`, no reload) and
