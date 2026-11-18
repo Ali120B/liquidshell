@@ -122,7 +122,7 @@ PanelWindow {
         anchors.centerIn: parent
         width: 200
         height: 34
-        radius: 17
+        radius: 0
         color: withAlpha(theme.surface, 0.55)
         border.width: 0
 
@@ -139,7 +139,7 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 height: 3
-                radius: 2
+                radius: 0
                 color: withAlpha(theme.surface_container, 0.65)
                 Rectangle {
                     width: parent.width * (osd.value / 100)

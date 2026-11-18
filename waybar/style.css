@@ -12,7 +12,7 @@ window#waybar {
     margin-bottom: 2px;
 }
 
-/* Section containers only position the capsules */
+/* Section containers only position the boxes */
 .modules-left {
     margin: 0 0 0 6px;
 }
@@ -25,7 +25,7 @@ window#waybar {
     margin: 0 6px 0 0;
 }
 
-/* Every module is its own pill/capsule */
+/* Every module is its own square box */
 #workspaces,
 #cpu,
 #memory,
@@ -35,12 +35,12 @@ window#waybar {
 #custom-pacman,
 #custom-power {
     background-color: rgba(20, 20, 20, 0.2);
-    border-radius: 999px;
+    border-radius: 0;
     padding: 0 12px;
     margin: 3px 2px;
 }
 
-/* Workspaces: a capsule of capsule buttons */
+/* Workspaces: square buttons */
 #workspaces {
     padding: 0 5px;
 }
@@ -48,7 +48,7 @@ window#waybar {
 #workspaces button {
     color: rgba(255, 255, 255, 0.45);
     background-color: transparent;
-    border-radius: 999px;
+    border-radius: 0;
     padding: 0 9px;
     margin: 3px 2px;
     border: none;
@@ -108,7 +108,7 @@ tooltip {
     background-color: rgba(20, 20, 20, 0.4);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 16px;
+    border-radius: 0;
 }
 
 tooltip label {
@@ -116,7 +116,7 @@ tooltip label {
     font-size: 14px;
 }
 
-/* Capsule hover: brighten the pill, keep its shape/height stable */
+/* Square box hover: brighten the box, keep its shape/height stable */
 #cpu,
 #memory,
 #clock,

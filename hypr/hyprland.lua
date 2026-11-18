@@ -100,7 +100,7 @@ hl.config({
         layout = "dwindle",
     },
     decoration = {
-        rounding = 24, -- big soft corners everywhere (floating + tiled windows)
+        rounding = 0, -- square corners everywhere (floating + tiled windows)
         active_opacity = 1.0,
         inactive_opacity = 1.0,
         dim_inactive = true, -- darken inactive instead of transparency (cheap + visible)

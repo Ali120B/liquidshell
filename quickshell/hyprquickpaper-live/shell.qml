@@ -179,7 +179,7 @@ PanelWindow {
 
                 ClippingRectangle {
                     anchors.fill: parent
-                    radius: 16
+                    radius: 0
                     color: "transparent"
 
                     Image {
@@ -229,7 +229,7 @@ PanelWindow {
                     anchors.fill: parent
                     visible: delegateItem.active
                     color: "transparent"
-                    radius: 16
+                    radius: 0
 
                     border.width: 2
                     border.color: configs.border_color

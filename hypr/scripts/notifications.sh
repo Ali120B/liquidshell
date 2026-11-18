@@ -28,9 +28,9 @@ echo "$NOTIFS" | rofi -dmenu \
     -theme-str 'window { location: center; width: 450px; }' \
     -theme-str 'listview { lines: 8; }' \
     -theme-str '* { background-color: #1a1b26E6; text-color: #c0caf5; }' \
-    -theme-str 'inputbar { background-color: #24283a; border-radius: 999px; padding: 8px 14px; }' \
+    -theme-str 'inputbar { background-color: #24283a; border-radius: 0; padding: 8px 14px; }' \
     -theme-str 'entry { background-color: transparent; text-color: #c0caf5; }' \
     -theme-str 'prompt { background-color: transparent; text-color: #7aa2f7; }' \
-    -theme-str 'element { padding: 8px 14px; border-radius: 14px; }' \
+    -theme-str 'element { padding: 8px 14px; border-radius: 0; }' \
     -theme-str 'element selected { background-color: #3b4261; text-color: #c0caf5; }' \
     -theme-str 'element normal { background-color: transparent; }'

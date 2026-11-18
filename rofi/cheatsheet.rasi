@@ -5,7 +5,7 @@ window {
     background-color: rgba(20, 20, 20, 0.92);
     border: 1px;
     border-color: #7AA2F7;
-    border-radius: 22px;
+    border-radius: 0;
     padding: 16px;
 }
 
@@ -34,7 +34,7 @@ listview {
 element {
     background-color: transparent;
     border: 0;
-    border-radius: 14px;
+    border-radius: 0;
     padding: 8px 14px;
     spacing: 8px;
 }

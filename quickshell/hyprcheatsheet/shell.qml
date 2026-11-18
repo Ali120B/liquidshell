@@ -37,6 +37,8 @@ ShellRoot {
 
     // section, keys, label
     property var entries: [
+	{ section: "Apps", keys: "Right click power icon", label: "Power level" },
+	{ section: "Apps", keys: "SUPER + SIFT + 3", label: "Toggle 3D Workspace" },
         { section: "Apps", keys: "SUPER", label: "Superlauncher" },
         { section: "Apps", keys: "SUPER + .", label: "Emoji Menu" },
         { section: "Apps", keys: "SUPER + T", label: "Terminal" },
@@ -141,7 +143,7 @@ ShellRoot {
 
             Rectangle {
                 anchors.fill: parent
-                radius: 30
+                radius: 0
                 color: "#8C151820"
                 border.width: 1
                 border.color: "#18FFFFFF"
@@ -192,7 +194,7 @@ ShellRoot {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 44
-                    radius: 22
+                    radius: 0
                     color: "#18FFFFFF"
                     border.width: 1
                     border.color: searchInput.activeFocus ? "#407AA2F7" : "#12FFFFFF"
@@ -249,7 +251,7 @@ ShellRoot {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    radius: 24
+                    radius: 0
                     color: "#12FFFFFF"
                     clip: true
 
@@ -277,7 +279,7 @@ ShellRoot {
                         }
 
                         highlight: Rectangle {
-                            radius: 14
+                            radius: 0
                             color: "#22FFFFFF"
                         }
                         highlightFollowsCurrentItem: true
@@ -292,7 +294,7 @@ ShellRoot {
                                 anchors.rightMargin: 10
                                 spacing: 12
                                 Rectangle {
-                                    radius: 9
+                                    radius: 0
                                     color: "#10FFFFFF"
                                     border.width: 1
                                     border.color: "#14FFFFFF"
