@@ -24,7 +24,7 @@ case "$LAST" in
         [[ -f "$LAST" ]] && { pkill -f "[m]pvpaper" 2>/dev/null; hyprctl hyprpaper wallpaper ",$LAST" 2>/dev/null || hyprctl hyprpaper wallpaper "eDP-1,$LAST" 2>/dev/null || true; bash "$HOME/.config/hypr/scripts/matugen.sh" "$LAST" 2>/dev/null & disown || true; exit 0; } ;;
 esac
 
-# Fallback: last not set or missing — try /home/wallpaper first, then Pictures
-for try in "/home/wallpaper/0002.jpg" "$HOME/Pictures/Wallpapers/0002.jpg" "$HOME/Pictures/wallpaper.jpg"; do
+# Fallback: last not set or missing — try the user's Pictures dir.
+for try in "$HOME/Pictures/Wallpapers/0002.jpg" "$HOME/Pictures/wallpaper.jpg"; do
     [[ -f "$try" ]] && { hyprctl hyprpaper wallpaper ",$try" 2>/dev/null || true; bash "$HOME/.config/hypr/scripts/matugen.sh" "$try" 2>/dev/null & disown || true; exit 0; }
 done

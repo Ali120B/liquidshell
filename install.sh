@@ -606,7 +606,7 @@ post_install() {
     if printf '%s\n' "${SELECTED[@]}" | grep -q "quickshell"; then
         mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Livewall"
         if [[ "${WALLPAPER_PICKER:-skwd}" == "legacy" ]]; then
-            cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
+            cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "$HOME/Pictures/Wallpapers")
             # Expand __HOME__ if needed
             cur_wall_expanded=$(echo "$cur_wall" | sed "s|__HOME__|$HOME|g")
             if [[ -z "$(ls -A "$cur_wall_expanded" 2>/dev/null)" ]]; then
@@ -659,7 +659,7 @@ post_install() {
             info "Skipping wallpaper location prompts (non-interactive update)"
         else
             header "Wallpaper Locations"
-            local cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "/home/wallpaper")
+            local cur_wall=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper/config.json" 2>/dev/null || echo "$HOME/Pictures/Wallpapers")
             local cur_live=$(jq -r '.wallpaper_path' "$HOME/.config/quickshell/hyprquickpaper-live/config.json" 2>/dev/null || echo "$HOME/Pictures/Livewall")
             echo -e "Current static: ${BOLD}$cur_wall${NC}"
             echo -e "Current live:   ${BOLD}$cur_live${NC}"
