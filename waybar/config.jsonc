@@ -3,11 +3,11 @@
     "position": "top",
     "exclusive": false,
     "height": 30,
-    "spacing": 4,
+    "spacing": 0,
 
     "modules-left": ["hyprland/workspaces", "cpu", "memory"],
     "modules-center": ["clock"],
-    "modules-right": ["mpris", "pulseaudio", "custom/pacman", "custom/power"],
+    "modules-right": ["pulseaudio", "mpris", "custom/pacman", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{id}",

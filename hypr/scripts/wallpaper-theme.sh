@@ -8,10 +8,24 @@ set -uo pipefail
 skwd_current_wallpaper() {
     command -v skwd-helm >/dev/null 2>&1 || return 1
 
-    local json key path img preview
+    local json key path img preview item
     json=$(skwd-helm current --json 2>/dev/null) || return 1
     key=$(printf '%s\n' "$json" | jq -r '.outputs[]? | select(.current != null and .current != "") | .current' 2>/dev/null | head -n 1)
     path=$(printf '%s\n' "$json" | jq -r '.outputs[]? | select(.path != null and .path != "") | .path' 2>/dev/null | head -n 1)
+
+    # Wallpaper Engine reports only its scene key; resolve it through the library.
+    if [[ -z "$path" && -n "$key" ]]; then
+        item=$(skwd-helm list --json 2>/dev/null \
+            | jq -r --arg k "$key" '
+                .wallpapers[]? | select(
+                    .key == $k or .key == ("we:" + $k) or
+                    (.path != null and (.path | endswith("/" + $k)))
+                ) | [.path, .preview] | @tsv' 2>/dev/null | head -n 1)
+        if [[ -n "$item" ]]; then
+            path=${item%%$'\t'*}
+            preview=${item#*$'\t'}
+        fi
+    fi
 
     # Static image or video file.
     if [[ -n "$path" && -f "$path" ]]; then printf '%s\n' "$path"; return 0; fi

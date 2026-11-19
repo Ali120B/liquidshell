@@ -46,8 +46,9 @@ hl.on("hyprland.start", function()
 
     hl.exec_cmd("quickshell -n -d")
     hl.exec_cmd("quickshell -n -d -p $HOME/.config/quickshell/mylauncher")
-    hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("bash $HOME/.config/hypr/scripts/restore-wallpaper.sh")
+    -- Starts hyprpaper/restore only in legacy mode; Skwd restores itself.
+    hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-backend.sh")
+    -- Wallpaper backend already started above.
     hl.exec_cmd("bash $HOME/.config/hypr/scripts/live-wallpaper-autopause.sh")
     hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-theme.sh --watch")
 end)

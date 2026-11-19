@@ -25,20 +25,44 @@ window#waybar {
     margin: 0 6px 0 0;
 }
 
-/* Every module is its own square box */
+/* Standalone boxes */
 #workspaces,
-#cpu,
-#memory,
-#clock,
-#pulseaudio,
-#mpris,
-#custom-pacman,
-#custom-power {
+#clock {
     background-color: rgba(20, 20, 20, 0.2);
     border-radius: 0;
     padding: 0 12px;
     margin: 3px 2px;
 }
+
+/* CPU + RAM share one rectangle (no gap between them) */
+#cpu,
+#memory {
+    background-color: rgba(20, 20, 20, 0.2);
+    border-radius: 0;
+    padding: 0 12px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+#cpu { margin-left: 2px; margin-right: 0; }
+#memory { margin-left: 0; margin-right: 2px; }
+
+/* Right-side modules share one rectangle */
+#pulseaudio,
+#mpris,
+#custom-sudo,
+#custom-pacman,
+#custom-power {
+    background-color: rgba(20, 20, 20, 0.2);
+    border-radius: 0;
+    padding: 0 12px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+#pulseaudio { margin-left: 2px; margin-right: 0; }
+#mpris,
+#custom-sudo,
+#custom-pacman { margin-left: 0; margin-right: 0; }
+#custom-power { margin-left: 0; margin-right: 6px; }
 
 /* Workspaces: square buttons */
 #workspaces {
