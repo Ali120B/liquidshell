@@ -63,5 +63,5 @@ fi
 
 pkill -SIGUSR1 -x kitty 2>/dev/null || true
 pkill -SIGUSR1 -x foot 2>/dev/null || true
-pkill -SIGUSR1 -x waybar 2>/dev/null || (pkill waybar 2>/dev/null; nohup waybar >/dev/null 2>&1 & disown)
+pkill -SIGUSR2 -x waybar 2>/dev/null || (pkill waybar 2>/dev/null; nohup waybar >/dev/null 2>&1 & disown)
 dunstctl reload 2>/dev/null || (pkill dunst 2>/dev/null; nohup dunst >/dev/null 2>&1 & disown)
