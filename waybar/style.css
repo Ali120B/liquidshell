@@ -67,15 +67,15 @@ window#waybar {
 
 /* Workspaces: square buttons */
 #workspaces {
-    padding: 0 5px;
+    padding: 0 3px;
 }
 
 #workspaces button {
     color: rgba(255, 255, 255, 0.45);
     background-color: transparent;
     border-radius: 0;
-    padding: 0 9px;
-    margin: 3px 2px;
+    padding: 0 6px;
+    margin: 3px 1px;
     border: none;
     transition: all 0.15s ease;
 }
