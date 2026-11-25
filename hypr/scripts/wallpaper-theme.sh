@@ -66,24 +66,66 @@ current_wallpaper() {
     return 1
 }
 
+using_skwd() {
+    [[ "$(cat "$HOME/.config/hypr/.wallpaper-picker" 2>/dev/null || true)" != "legacy" ]] \
+        && command -v skwd-helm >/dev/null 2>&1
+}
+
 case "${1:---current}" in
     --current)
-        wall=$(current_wallpaper) || exit 0
-        bash "$HOME/.config/hypr/scripts/matugen.sh" "$wall" 2>/dev/null & disown || true
+        if using_skwd; then
+            bash "$HOME/.config/hypr/scripts/skwd-theme.sh" 2>/dev/null & disown || true
+        else
+            wall=$(current_wallpaper) || exit 0
+            bash "$HOME/.config/hypr/scripts/matugen.sh" "$wall" 2>/dev/null & disown || true
+        fi
         ;;
     --watch)
-        # First poll fires immediately so a restored wallpaper gets themed once,
-        # then only actual wallpaper changes trigger matugen.
-        last=""
-        while true; do
-            if wall=$(current_wallpaper); then
-                if [[ "$wall" != "$last" ]]; then
-                    last="$wall"
-                    bash "$HOME/.config/hypr/scripts/matugen.sh" "$wall" 2>/dev/null & disown || true
-                fi
+        if using_skwd; then
+            # Skwd rewrites scheme.json on every wallpaper/theme change. Watch
+            # that file directly so apps retheme as soon as the new palette lands
+            # (no 5s poll, no lagging skwd.wall.theme_done event).
+            bash "$HOME/.config/hypr/scripts/skwd-theme.sh" 2>/dev/null & disown || true
+            scheme="$HOME/.cache/skwd-wall-v2/scheme.json"
+            if command -v inotifywait >/dev/null 2>&1; then
+                while true; do
+                    last_run=0
+                    while IFS= read -r f; do
+                        [[ "$f" == "scheme.json" ]] || continue
+                        now=$(date +%s)
+                        if (( now - last_run >= 1 )); then
+                            last_run=$now
+                            bash "$HOME/.config/hypr/scripts/skwd-theme.sh" 2>/dev/null & disown || true
+                        fi
+                    done < <(stdbuf -oL inotifywait -m -q -e close_write,moved_to --format '%f' \
+                        "$(dirname "$scheme")" 2>/dev/null)
+                    sleep 1
+                done
+            else
+                last=""
+                while true; do
+                    cur=$(stat -c '%y' "$scheme" 2>/dev/null || true)
+                    if [[ -n "$cur" && "$cur" != "$last" ]]; then
+                        last="$cur"
+                        bash "$HOME/.config/hypr/scripts/skwd-theme.sh" 2>/dev/null & disown || true
+                    fi
+                    sleep 0.1
+                done
             fi
-            sleep 5
-        done
+        else
+            # First poll fires immediately so a restored wallpaper gets themed once,
+            # then only actual wallpaper changes trigger matugen.
+            last=""
+            while true; do
+                if wall=$(current_wallpaper); then
+                    if [[ "$wall" != "$last" ]]; then
+                        last="$wall"
+                        bash "$HOME/.config/hypr/scripts/matugen.sh" "$wall" 2>/dev/null & disown || true
+                    fi
+                fi
+                sleep 5
+            done
+        fi
         ;;
     *) echo "usage: wallpaper-theme.sh [--current|--watch]" >&2; exit 1 ;;
 esac

@@ -90,7 +90,8 @@ hl.config({
 hl.config({
     general = {
         gaps_in = 3,
-        gaps_out = 5,
+        -- Reserve the top bar's height so tiled windows never slide under waybar.
+        gaps_out = { top = 35, right = 5, bottom = 5, left = 5 },
         border_size = 2,
         col = {
             active_border = "rgba(ffffff40)",
