@@ -118,6 +118,15 @@ window#waybar {
     color: #6c7086;
 }
 
+/* Passwordless sudo (adaptive matugen colors) */
+#custom-sudo {
+    color: @outline;
+}
+#custom-sudo.active {
+    color: @primary;
+    font-weight: bold;
+}
+
 /* MPRIS */
 #mpris {
     min-width: 0;
