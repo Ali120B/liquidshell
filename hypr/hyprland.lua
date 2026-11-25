@@ -92,7 +92,7 @@ hl.config({
         gaps_in = 3,
         -- Waybar reserves its own height (exclusive); keep only a tiny gap.
         gaps_out = { top = 2, right = 5, bottom = 5, left = 5 },
-        border_size = 2,
+        border_size = 1,
         col = {
             active_border = "rgba(ffffff40)",
             inactive_border = "rgba(ffffff1e)",
