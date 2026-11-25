@@ -34,6 +34,7 @@ hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("kitty --class fzf -e sh -c 'file=$
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = 0 }))
 hl.bind(mainMod .. " + Space", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd(home .. "/.config/hypr/scripts/opacity.sh"))
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(home .. "/.local/bin/sudo-passwordless --toggle"))
 
 -- Toggle waybar
 hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("sh -c 'pgrep -x waybar >/dev/null && pkill waybar || nohup waybar >/dev/null 2>&1 &'"))
