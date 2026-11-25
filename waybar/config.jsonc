@@ -10,7 +10,7 @@
 
     "modules-left": ["hyprland/workspaces", "cpu", "memory"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "mpris", "custom/pacman", "custom/power"],
+    "modules-right": ["pulseaudio", "custom/pacman", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{id}",
