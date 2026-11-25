@@ -29,7 +29,7 @@ window#waybar {
 /* Standalone boxes */
 #workspaces,
 #clock {
-    background-color: rgba(20, 20, 20, 0.2);
+    background-color: transparent;
     border-radius: 0;
     padding: 0 12px;
     margin: 3px 2px;
@@ -38,7 +38,7 @@ window#waybar {
 /* CPU + RAM share one rectangle (no gap between them) */
 #cpu,
 #memory {
-    background-color: rgba(20, 20, 20, 0.2);
+    background-color: transparent;
     border-radius: 0;
     padding: 0 12px;
     margin-top: 3px;
@@ -53,7 +53,7 @@ window#waybar {
 #custom-sudo,
 #custom-pacman,
 #custom-power {
-    background-color: rgba(20, 20, 20, 0.2);
+    background-color: transparent;
     border-radius: 0;
     padding: 0 12px;
     margin-top: 3px;
@@ -82,12 +82,12 @@ window#waybar {
 
 #workspaces button:hover {
     color: #ffffff;
-    background-color: alpha(@primary, 0.2);
+    background-color: transparent;
 }
 
 #workspaces button.active {
-    color: @on_primary;
-    background-color: @primary;
+    color: @primary;
+    background-color: transparent;
     font-weight: bold;
 }
 
@@ -157,7 +157,8 @@ tooltip label {
 #clock:hover,
 #pulseaudio:hover,
 #mpris:hover,
+#custom-sudo:hover,
 #custom-pacman:hover,
 #custom-power:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: transparent;
 }
