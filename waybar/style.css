@@ -7,8 +7,8 @@
 }
 
 window#waybar {
-    /* Fixed black backdrop (not touched by matugen). */
-    background-color: rgba(0, 0, 0, 0.78);
+    /* Fixed black backdrop (not touched by matugen); matches SUPER+O 90% transparency. */
+    background-color: rgba(0, 0, 0, 0.1);
     color: #ffffff;
     margin-bottom: 2px;
 }
