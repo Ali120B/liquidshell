@@ -127,6 +127,15 @@ window#waybar {
     font-weight: bold;
 }
 
+/* Keep awake (adaptive matugen colors) */
+#custom-keepawake {
+    color: @outline;
+}
+#custom-keepawake.active {
+    color: @primary;
+    font-weight: bold;
+}
+
 /* MPRIS */
 #mpris {
     min-width: 0;

@@ -10,7 +10,7 @@
 
     "modules-left": ["hyprland/workspaces", "cpu", "memory"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "custom/pacman", "custom/power"],
+    "modules-right": ["pulseaudio", "custom/pacman", "custom/keepawake", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{id}",
@@ -68,6 +68,14 @@
         "interval": 3600,
         "on-click": "kitty -e yay",
         "tooltip": true
+    },
+
+    "custom/keepawake": {
+        "exec": "$HOME/.config/hypr/scripts/keep-awake.sh status",
+        "return-type": "json",
+        "interval": 2,
+        "tooltip": true,
+        "on-click": "$HOME/.config/hypr/scripts/keep-awake.sh toggle"
     },
 
     "custom/power": {
