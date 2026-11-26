@@ -52,6 +52,7 @@ window#waybar {
 #mpris,
 #custom-sudo,
 #custom-pacman,
+#custom-keepawake,
 #custom-power {
     background-color: transparent;
     border-radius: 0;
@@ -63,6 +64,7 @@ window#waybar {
 #mpris,
 #custom-sudo,
 #custom-pacman { margin-left: 0; margin-right: 0; }
+#custom-keepawake { margin-left: 0; margin-right: 2px; }
 #custom-power { margin-left: 0; margin-right: 6px; }
 
 /* Workspaces: square buttons */
@@ -166,6 +168,7 @@ tooltip label {
 #pulseaudio,
 #mpris,
 #custom-pacman,
+#custom-keepawake,
 #custom-power {
     transition: background-color 0.15s ease;
 }
@@ -177,6 +180,7 @@ tooltip label {
 #mpris:hover,
 #custom-sudo:hover,
 #custom-pacman:hover,
+#custom-keepawake:hover,
 #custom-power:hover {
     background-color: transparent;
 }
