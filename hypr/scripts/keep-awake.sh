@@ -23,8 +23,8 @@ start() {
     is_active && return 0
     # If the panel is already down, this toggle doesn't count.
     screen_on || return 0
-    systemd-inhibit --what=idle --mode=block \
-        --who="Waybar keep awake" --why="Keep the screen on" \
+    systemd-inhibit --what=sleep --mode=block \
+        --who="Waybar keep awake" --why="Prevent suspend" \
         sleep infinity >/dev/null 2>&1 &
     echo $! > "$PID_FILE"
 }
@@ -38,7 +38,7 @@ stop() {
 
 status() {
     if is_active; then
-        printf '{"text":"󰥔","tooltip":"Keep awake: on (screen only)","class":"active"}\n'
+        printf '{"text":"󰥔","tooltip":"Keep awake: on (no suspend)","class":"active"}\n'
     else
         printf '{"text":"󰥔","tooltip":"Keep awake: off","class":"inactive"}\n'
     fi
