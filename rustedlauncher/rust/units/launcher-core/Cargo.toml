@@ -1,0 +1,10 @@
+[package]
+name = "launcher-core"
+description = "Desktop-entry index, ranking, history and launch planning for rustedlauncher"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
