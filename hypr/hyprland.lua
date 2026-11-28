@@ -21,7 +21,7 @@ hl.monitor({
 
 mainMod    = "SUPER"
 terminal   = "footclient -o 'font=Tiny5 Mono CRT:size=14, JetBrainsMono Nerd Font:size=14'" -- CRT font now; foot.ini applies after server restart
-menu       = "$HOME/liquidshell/rustedlauncher/rust/target/release/rustedlauncher toggle"
+menu       = "quickshell ipc -p $HOME/.config/quickshell/mylauncher call mylauncher toggle"
 fileManager = "nautilus"
 browser    = "zen-browser"
 
@@ -45,9 +45,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("/usr/lib/hyprpolkitagent/hyprpolkitagent")
 
     hl.exec_cmd("quickshell -n -d")
-    -- mylauncher stays in ~/.config/quickshell/mylauncher as reference only;
-    -- it no longer autostarts. The Rust port owns SUPER-tap now.
-    hl.exec_cmd("$HOME/liquidshell/rustedlauncher/run.sh")
+    hl.exec_cmd("quickshell -n -d -p $HOME/.config/quickshell/mylauncher")
     -- Starts hyprpaper/restore only in legacy mode; Skwd restores itself.
     hl.exec_cmd("bash $HOME/.config/hypr/scripts/wallpaper-backend.sh")
     -- Wallpaper backend already started above.

@@ -5,8 +5,8 @@
 
 local home = os.getenv("HOME")
 
--- Launchers (SUPER-tap toggles rustedlauncher, the Rust port of mylauncher)
-hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd(home .. "/liquidshell/rustedlauncher/rust/target/release/rustedlauncher toggle"), { release = true })
+-- Launchers (SUPER-tap toggles mylauncher, a quickshell daemon)
+hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("quickshell ipc -p " .. home .. "/.config/quickshell/mylauncher call mylauncher toggle"), { release = true })
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))

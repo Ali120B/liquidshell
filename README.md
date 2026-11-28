@@ -13,7 +13,7 @@ A full Hyprland rice with Quickshell, frosted glass Waybar, wallpaper picker, re
 | Component | Description |
 |-----------|-------------|
 | **Hyprland** | Lua config (v0.55+) — keybinds, window rules, animations, blur, opacity (Dusky showcase preset, 12 switchable presets in `hypr/animations/`; minimal fade for quickshell layers, windows sped up) |
-| **Launcher** | Rust app launcher (`SUPER`, `rustedlauncher` IPC) — source in `rustedlauncher/` (GTK4 layer shell, replaces the `mylauncher` QML, which stays as reference) |
+| **Launcher** | One-shot app launcher (`SUPER`, `mylauncher` IPC) |
 | **hypr-lens** | Region screenshot, OCR, search, recording — [Ali120B/hypr-lens](https://github.com/Ali120B/hypr-lens) (custom `record.sh` overlay) |
 | **Waybar** | Frosted glass top bar — workspaces, CPU, RAM, clock, mpris, volume, power button |
 | **skwd-wall** | Wallpaper manager — picker + mixer, images / video / Wallpaper Engine scenes |
@@ -43,7 +43,7 @@ Suggested: fullscreen desktop, waybar closeup, rofi launcher.
 
 | Key | Action |
 |-----|--------|
-| `SUPER` | App Launcher (rustedlauncher) |
+| `SUPER` | App Launcher (mylauncher) |
 | `SUPER + T` | Terminal (Foot) |
 | `SUPER + E` | File Manager (spf in Kitty) |
 | `SUPER + B` | Browser (Zen) |
