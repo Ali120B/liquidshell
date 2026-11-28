@@ -593,6 +593,9 @@ pub fn run() -> std::process::ExitCode {
     // Register and build the windows before running the loop. `activate`
     // sometimes never fires for a daemon with no initial window, and then the
     // application exits at once with nothing wired up.
+    // GApplication warns without an activate handler; the windows are built
+    // below, so this exists only to satisfy it.
+    app.connect_activate(|_| {});
     if let Err(error) = app.register(None::<&gtk::gio::Cancellable>) {
         eprintln!("rustedlauncher: cannot start GTK: {error}");
         return std::process::ExitCode::FAILURE;
